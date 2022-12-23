@@ -88,8 +88,10 @@ class Character(pygame.sprite.Sprite):
     def move(self):
         pass
 
+
 class Player(Character):
     pass
+
 
 class Texture(pygame.sprite.Sprite):
     image = load_image("characters/mario.png")
