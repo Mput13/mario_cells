@@ -4,6 +4,9 @@ import pygame
 import sys
 import os
 
+FPS = 50
+WIDTH = 400
+HEIGHT = 300
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -27,7 +30,8 @@ class Game:
         self.height = height
         self.width = width
         self.fps = fps
-        player = Player()
+        self.player = Player()
+        self.enemis = None
         self.running = False
         self.background = pygame.Color('black')
 
@@ -74,32 +78,56 @@ class Weapon:
 class Character(pygame.sprite.Sprite):
     image = load_image("characters/mario.png")
 
-    def __init__(self, *group):
+    def __init__(self, *group, speed=200, health=100):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite. Это очень важно !!!
         super().__init__(*group)
-        self.image = Character.image
         self.rect = self.image.get_rect()
-        mp = pygame.mouse.get_pos()
-        self.speed = 200
-        self.rect.x = mp[0]
-        self.rect.y = mp[1]
-        self.health = 100
+        self.speed = speed
+        self.health = health
 
     def move(self):
         pass
 
 
 class Player(Character):
-    pass
+    def bow_shot(self):
+        pass
+
+    def blade_shot(self):
+        pass
+
+    def shild_shot(self):
+        pass
+
+    def move(self):
+        pass
 
 
 class Texture(pygame.sprite.Sprite):
-    image = load_image("characters/mario.png")
+    image = load_image("textures/mario.png")
 
     def __init__(self, *group):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite. Это очень важно !!!
         super().__init__(*group)
         self.image = Texture.image
+
+
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+        self.delimeter = 10
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx // self.delimeter
+        obj.rect.y += self.dy // self.delimeter
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - WIDTH // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - HEIGHT // 2)
 
 
 characters = pygame.sprite.Group()
