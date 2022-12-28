@@ -4,10 +4,10 @@ import pygame
 import sys
 import os
 
-FPS = 50
+GRAVITY = 2
+FPS = 60
 WIDTH = 400
 HEIGHT = 300
-
 
 def generate_level(level):
     new_player, x, y = None, None, None
@@ -16,7 +16,9 @@ def generate_level(level):
             if level[y][x] == '.':
                 Tile('empty', x, y)
             elif level[y][x] == '#':
-                Box('wall', x, y)
+                Tile('block', x, y)
+            elif level[y][x] == '?':
+                Tile('qustion_block', x, y)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
@@ -67,18 +69,26 @@ class Game:
         self.event_handlers = collections.defaultdict(list)
 
     def setup(self):
-        pass
+        self.register_event()
 
     def register_event(self, event_type, action):
         self.event_handlers[event_type].append(action)
 
     def start(self):
         screen = pygame.display.set_mode((self.width, self.height))
+        camera = Camera()
+        player, level_x, level_y = generate_level(load_level(''))
 
+        running = True
         timer = pygame.time.Clock()
-
         self.running = True
         while self.running:
+            delta_t = timer.tick(self.fps) / 1000
+            key = pygame.key.get_pressed()
+            if key[pygame.K_a]:
+                player.move(delta_t, left=True)
+            elif key[pygame.K_d]:
+                player.move(delta_t)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -87,7 +97,6 @@ class Game:
                         callback(event)
 
             screen.fill(self.background)
-            delta_t = timer.tick(self.fps) / 1000
             self.update(screen, delta_t)
             pygame.display.flip()
 
@@ -104,6 +113,14 @@ class Weapon:
         pass
 
 
+class QuestionBox(pygame.sprite.Sprite):
+    def __init__(self, tile_type, pos_x, pos_y):
+        super().__init__(boxes_group, tiles_group, all_sprites)
+        self.image = tile_images[tile_type]
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+
+
 class Character(pygame.sprite.Sprite):
     image = load_image("characters/mario.png")
 
@@ -111,11 +128,10 @@ class Character(pygame.sprite.Sprite):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite. Это очень важно !!!
         super().__init__(*group)
         self.rect = self.image.get_rect()
-        self.speed = speed
+        self.x_speed = speed
+        self.y_speed = -GRAVITY
         self.health = health
 
-    def move(self):
-        pass
 
 
 class Player(Character):
@@ -128,8 +144,12 @@ class Player(Character):
     def shild_shot(self):
         pass
 
-    def move(self):
-        pass
+    def move(self, delta_t, left=False, right=False):
+        if right:
+            self.rect.x += self.x_speed * delta_t
+        elif left:
+            self.rect.x -= self.x_speed * delta_t
+
 
 # группы спрайтов
 all_sprites = pygame.sprite.Group()
@@ -137,7 +157,7 @@ tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 boxes_group = pygame.sprite.Group()
 
-tile_images = {}
+tile_images = {'block': 'block.png', 'qustion_block': 'qustion_block.png'}
 player_image = load_image('characters/mario.png')
 tile_width = tile_height = 50
 
@@ -148,6 +168,8 @@ class Tile(pygame.sprite.Sprite):
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
+
+
 
 
 class Camera:
@@ -168,4 +190,9 @@ class Camera:
         self.dy = -(target.rect.y + target.rect.h // 2 - HEIGHT // 2)
 
 
+camera = Camera()
+player, level_x, level_y = generate_level(load_level('map.txt'))
 
+
+
+running = True
