@@ -1,3 +1,6 @@
+from constants import WIDTH, HEIGHT
+
+
 class Camera:
     def __init__(self):
         self.dx = 0

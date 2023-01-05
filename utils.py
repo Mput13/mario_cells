@@ -1,4 +1,9 @@
 import os
+import sys
+
+import pygame
+
+from tiles import Tile
 
 
 def load_image(name, colorkey=None):
@@ -31,5 +36,11 @@ def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
-            pass
+            if level[y][x] == '.':
+                Tile('empty', x, y)
+            elif level[y][x] == '#':
+                pass
+            elif level[y][x] == '@':
+                Tile('empty', x, y)
+                new_player = Player(x, y)
     return new_player, x, y

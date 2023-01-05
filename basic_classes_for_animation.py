@@ -1,4 +1,7 @@
 import pygame
+from pygame.sprite import AbstractGroup
+
+from constants import FPS
 
 
 class Animated:
@@ -129,6 +132,6 @@ class ActionAnimatedSprite(pygame.sprite.Sprite):
     def flip_left(self):
         self._horizontal_flip(is_right=False)
 
-    def update(self, *args: Any, **kwargs: Any) -> None:
+    def update(self, *args, **kwargs) -> None:
         self.current_animation.update()
         self.image = self.current_animation.image
