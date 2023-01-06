@@ -1,0 +1,2 @@
+FPS = 60
+GRAVITY = 0.02

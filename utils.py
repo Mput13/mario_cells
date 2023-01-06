@@ -1,8 +1,10 @@
-import os
+import os, sys
+import pygame
+from typing import TypeVar, Callable
 
 
 def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
+    fullname = os.path.join(name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
@@ -32,6 +34,10 @@ def generate_level(level):
         for x in range(len(level[y])):
             pass
     return new_player, x, y
+
+
+Func = TypeVar('Func', bound=Callable)
+
 
 def alive_only(func: Func) -> Func:
     def wrapper(self, *args, **kwargs):

@@ -1,4 +1,6 @@
 import pygame
+from pygame.sprite import AbstractGroup
+from typing import Any
 
 
 class Animated:
