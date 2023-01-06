@@ -32,3 +32,11 @@ def generate_level(level):
         for x in range(len(level[y])):
             pass
     return new_player, x, y
+
+def alive_only(func: Func) -> Func:
+    def wrapper(self, *args, **kwargs):
+        if self.is_dead:
+            return
+        return func(self, *args, **kwargs)
+
+    return wrapper
