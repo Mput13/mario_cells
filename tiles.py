@@ -1,8 +1,12 @@
 import pygame
+
+from constants import WIDTH, HEIGHT
 from sprite_groups import all_sprites, boxes_group, tiles_group
 from utils import load_image
 
-tile_images = {'block': 'block.png', 'qustion_block': 'qustion_block.png'}
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+tile_images = {'block': load_image('block.png'), 'question_block': load_image('question_block.png'),
+               'brick': load_image('brick.png')}
 player_image = load_image('characters/mario.png')
 tile_width = tile_height = 50
 
