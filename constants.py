@@ -1,2 +1,4 @@
 FPS = 60
-GRAVITY = 0.02
+GRAVITY = 4
+RIGHT = 1
+LEFT = -1
