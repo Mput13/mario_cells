@@ -231,3 +231,37 @@ class Shield(pygame.sprite.Sprite):
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == self.button:
                 self.kill()
+
+pygame.init()
+window = pygame.display.set_mode((700, 700))
+clock = pygame.time.Clock()
+sword = pygame.sprite.Group()
+wall = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
+enemy_shells = pygame.sprite.Group()
+run = True
+shield_l = False
+while run:
+    clock.tick(60)
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if not active_weapons_group:
+                shield_l = Shield((340, 550), enemy_shells, event.button, LEFT)
+                s_r = Shield((360, 550), enemy_shells, event.button, RIGHT)
+                sw_l = Sword(1, 1, 1, (350, 150), enemy_group, 1, LEFT)
+                sw_r = Sword(1, 1, 1, (350, 150), enemy_group, 1, RIGHT)
+                b_r = Bow(1, 1, 1, (360, 350), enemy_group, wall, 2, 100, RIGHT)
+                b_l = Bow(1, 1, 1, (340, 350), enemy_group, wall, 2, 100, LEFT)
+
+        if event.type == pygame.QUIT:
+            run = False
+    delta_t = clock.tick(60) / 1000
+    window.fill(0)
+    all_sprites.update(delta_t=delta_t)
+
+    window.fill(0)
+    all_sprites.draw(window)
+    pygame.display.flip()
+
+pygame.quit()
+exit()

@@ -26,7 +26,7 @@ class Game:
     def start(self):
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
         camera = Camera()
-        self.player = generate_level(load_level('test_level.txt'))
+        self.player = generate_level(load_level('maps/test_level.txt'))
         self.running = True
         timer = pygame.time.Clock()
         self.running = True
