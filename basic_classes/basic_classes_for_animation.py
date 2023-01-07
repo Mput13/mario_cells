@@ -1,6 +1,7 @@
 import pygame
 from pygame.sprite import AbstractGroup
 from typing import Any
+from values.constants import FPS, RIGHT, LEFT
 
 
 class Animated:
@@ -9,7 +10,9 @@ class Animated:
 
     rect: pygame.Rect
 
-    def __init__(self, sheet, columns, rows):
+    def __init__(self, sheet, columns, rows, target_size: (int, int), direction):
+        self.TARGET_SIZE = target_size
+        self.direction = direction
         self.frames: list[pygame.Surface] = []
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
@@ -21,12 +24,19 @@ class Animated:
         self.single_play = False
 
     def cut_sheet(self, sheet, columns, rows):
+        if self.direction == RIGHT:
+            start = 0
+            end = columns
+        else:
+            start = columns - 1
+            end = -1
+        step = self.direction
         self.rect = pygame.Rect(
             0, 0, sheet.get_width() // columns,
                   sheet.get_height() // rows
         )
         for j in range(rows):
-            for i in range(columns):
+            for i in range(start, end, step):
                 frame_location = (self.rect.w * i, self.rect.h * j)
 
                 part = sheet.subsurface(pygame.Rect(frame_location, self.rect.size))
@@ -59,10 +69,10 @@ class Animated:
 
 
 class ActionAnimation(Animated):
-    def __init__(self, sheet, columns, rows, speed=None, *args):
+    def __init__(self, sheet, columns, rows, target_size: (int, int), speed=None, direction: int = 1, *args):
         if speed:
             self.SPEED_PER_SEC = speed
-        super().__init__(sheet, columns, rows)
+        super().__init__(sheet, columns, rows, target_size, direction)
 
 
 class ActionAnimatedSprite(pygame.sprite.Sprite):

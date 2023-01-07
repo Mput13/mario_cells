@@ -1,10 +1,10 @@
 import random
-from utils import load_image
 import pygame
 from pygame.sprite import AbstractGroup
-from basic_classes.basic_classes_for_animation import ActionAnimatedSprite
-from constants import GRAVITY, RIGHT, LEFT
-from sprite_groups import all_sprites, active_weapons_group
+from basic_classes.basic_classes_for_animation import ActionAnimation
+from values.constants import GRAVITY, RIGHT, LEFT
+from values.sprite_groups import all_sprites, active_weapons_group
+from values.animation import BowAnimations
 from typing import Any
 
 
@@ -43,8 +43,8 @@ class Sword(DealingDamage):
                  crit_chance: float,
                  pos: (int, int),
                  enemy_group: AbstractGroup,
-                 direction: int = 1,
-                 speed: float = 1):
+                 speed: float = 1,
+                 direction: int = 1):
         super().__init__(damage, crit_multiplier, crit_chance, pos, enemy_group, direction,
                          active_weapons_group, all_sprites)
         self.enemy_group = enemy_group
@@ -54,32 +54,26 @@ class Sword(DealingDamage):
         self.radius = self.image.get_rect().height // 2
         self.angle = 10
         self.pos = pos
-        self.animate = False
         self.angle = 10
         self.speed = speed
         self.mask = pygame.mask.from_surface(self.image)
         self.conflict_list = []
 
     def update(self, *args: Any, **kwargs: Any) -> None:
-        if self.animate:
-            center = pygame.math.Vector2(self.pos) + pygame.math.Vector2(0, -self.radius).rotate(
-                self.angle * self.direction)
-            self.image = pygame.transform.rotate(self.original_image, -self.angle * self.direction)
-            self.rect = self.image.get_rect(center=(round(center.x), round(center.y)))
-            self.dealing_damage()
-            self.turn_right()
-            self.stop_animation()
+        center = pygame.math.Vector2(self.pos) + pygame.math.Vector2(0, -self.radius).rotate(
+            self.angle * self.direction)
+        self.image = pygame.transform.rotate(self.original_image, -self.angle * self.direction)
+        self.rect = self.image.get_rect(center=(round(center.x), round(center.y)))
+        self.dealing_damage()
+        self.turn_right()
+        self.stop_animation()
 
     def turn_right(self):
         self.angle = self.angle + self.speed
 
-    def start_animation(self):
-        self.animate = True
-
     def stop_animation(self):
         if self.angle >= 90:
             self.kill()
-            self.animate = False
             self.angle = 10
 
     def dealing_damage(self):
@@ -88,10 +82,6 @@ class Sword(DealingDamage):
             if enemy not in self.conflict_list:
                 self.conflict_list.append(enemy)
                 enemy.health -= self.get_damage()
-
-
-class Bow(ActionAnimatedSprite):
-    pass
 
 
 class Arrow(DealingDamage):
@@ -105,7 +95,7 @@ class Arrow(DealingDamage):
                  pos: (int, int),
                  enemy_group: AbstractGroup,
                  tiles_group: AbstractGroup,
-                 speed: float = 1,
+                 flight_speed: float = 1,
                  flight_range: int = 500,
                  direction: int = 1):
         super().__init__(damage, crit_multiplier, crit_chance, pos, enemy_group, direction, all_sprites)
@@ -114,7 +104,7 @@ class Arrow(DealingDamage):
         width = self.image.get_width()
         height = self.image.get_height()
         self.rect = pygame.Rect(pos[0], pos[1], width, height)
-        self.flight_vector = pygame.Vector2(speed * self.direction, 0)
+        self.flight_speed = pygame.Vector2(flight_speed * self.direction, 0)
         self.mask = pygame.mask.from_surface(self.image)
         self.gravity_speed = 0
         self.flight_range = flight_range
@@ -146,8 +136,60 @@ class Arrow(DealingDamage):
         self.enabling_gravity(delta_t)
         self.dealing_damage()
         self.collision_with_tiles()
-        vector = self.flight_vector + pygame.Vector2(0, self.gravity_speed)
+        vector = self.flight_speed + pygame.Vector2(0, self.gravity_speed)
         self.rect.move_ip(*vector)
+
+
+class Bow(DealingDamage):
+    def __init__(self,
+                 damage: int,
+                 crit_multiplier: float,
+                 crit_chance: float,
+                 pos: (int, int),
+                 enemy_group: AbstractGroup,
+                 tiles_group: AbstractGroup,
+                 flight_speed: float = 1,
+                 flight_range: int = 500,
+                 direction: int = 1):
+        super().__init__(damage, crit_multiplier, crit_chance, pos, enemy_group, direction,
+                         active_weapons_group, all_sprites)
+        self.tiles_group = tiles_group
+        self.flight_speed = flight_speed
+        self.flight_range = flight_range
+        self.choosing_direction()
+        self.animation.set_play_single()
+        self.image = self.animation.image
+        self.rect = self.animation.rect
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+        self.arrow_fired = False
+
+    def choosing_direction(self):
+        animations: dict[BowAnimations, BowAnimations] = {animation.name: animation.value for animation in
+                                                          BowAnimations}
+        if self.direction == RIGHT:
+            self.animation: ActionAnimation = animations['shot_right']
+        else:
+            self.animation: ActionAnimation = animations['shot_left']
+
+    def arrow_release(self):
+        if self.animation.cur_frame == 12 and not self.arrow_fired:
+            pos = (self.pos[0] - Arrow.IMAGE_RIGHT.get_width() // 4,
+                   self.pos[1] + self.rect.height // 2 - Arrow.IMAGE_RIGHT.get_height() // 2)
+            arrow = Arrow(self.damage, self.crit_multiplier, self.crit_chance, pos, self.enemy_group, self.tiles_group,
+                          self.flight_speed, self.flight_range, self.direction)
+            self.arrow_fired = True
+
+    def stop_animation(self):
+        if self.animation.cur_frame == 23:
+            self.kill()
+            self.animation.reset()
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        self.animation.update()
+        self.arrow_release()
+        self.image = self.animation.image
+        self.stop_animation()
 
 
 class Shield(pygame.sprite.Sprite):
@@ -157,14 +199,16 @@ class Shield(pygame.sprite.Sprite):
     def __init__(self,
                  pos: (int, int),
                  enemy_shells: AbstractGroup,
+                 button,
                  direction: int = 1):
-        super().__init__(all_sprites)
+        super().__init__(all_sprites, active_weapons_group)
         self.direction = direction
         self.selection_image()
         width = self.image.get_width()
         height = self.image.get_height()
         self.rect = pygame.Rect(pos[0], pos[1], width, height)
         self.enemy_shells = enemy_shells
+        self.button = button
 
     def selection_image(self):
         if self.direction == RIGHT:
@@ -182,37 +226,8 @@ class Shield(pygame.sprite.Sprite):
     def blocking(self):
         pass
 
-
-pygame.init()
-window = pygame.display.set_mode((700, 700))
-clock = pygame.time.Clock()
-sword = pygame.sprite.Group()
-wall = pygame.sprite.Group()
-enemy_group = pygame.sprite.Group()
-enemy_shells = pygame.sprite.Group()
-run = True
-while run:
-    clock.tick(60)
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            arrow_r = Arrow(1, 1, 1, (350, 350), enemy_group, wall, 2, 100, RIGHT)
-            arrow_l = Arrow(1, 1, 1, (350, 350), enemy_group, wall, 2, 100, LEFT)
-            sword_r = Sword(1, 1, 1, (350, 150), enemy_group, RIGHT, 1)
-            sword_l = Sword(1, 1, 1, (350, 150), enemy_group, LEFT, 1)
-            sword_l.start_animation()
-            sword_r.start_animation()
-            shield_r = Shield((360, 550), enemy_shells, RIGHT)
-            shield_l = Shield((340, 550), enemy_shells, LEFT)
-
-        if event.type == pygame.QUIT:
-            run = False
-    delta_t = clock.tick(60) / 1000
-    window.fill(0)
-    all_sprites.update(delta_t)
-
-    window.fill(0)
-    all_sprites.draw(window)
-    pygame.display.flip()
-
-pygame.quit()
-exit()
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        self.blocking()
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == self.button:
+                self.kill()
