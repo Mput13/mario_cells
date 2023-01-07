@@ -1,7 +1,7 @@
 import pygame
 from pygame.sprite import AbstractGroup
 
-from constants import FPS
+from values.constants import FPS
 
 
 class Animated:

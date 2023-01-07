@@ -1,7 +1,7 @@
 import pygame
 
-from constants import WIDTH, HEIGHT, GRAVITY
-from sprite_groups import all_sprites, boxes_group, tiles_group
+from values.constants import WIDTH, HEIGHT, GRAVITY
+from values.sprite_groups import all_sprites, boxes_group, tiles_group
 from utils import load_image
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))

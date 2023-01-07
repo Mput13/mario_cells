@@ -3,9 +3,9 @@ import collections
 import pygame
 
 from camera import Camera
-from constants import GRAVITY, WIDTH, HEIGHT, FPS
+from values.constants import WIDTH, HEIGHT, FPS
 from level_work import generate_level, load_level
-from sprite_groups import all_sprites, tiles_group, boxes_group
+from values.sprite_groups import all_sprites, tiles_group
 from utils import load_image
 
 

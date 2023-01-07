@@ -1,6 +1,6 @@
 import os
 import sys
-from  typing import Callable, TypeVar
+from typing import Callable, TypeVar
 
 import pygame
 

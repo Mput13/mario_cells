@@ -1,4 +1,4 @@
-from constants import WIDTH, HEIGHT
+from values.constants import WIDTH, HEIGHT
 
 
 class Camera:
