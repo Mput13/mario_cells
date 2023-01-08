@@ -34,7 +34,7 @@ class Character(pygame.sprite.Sprite):
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect()
         self.x_speed = speed
-        self.y_speed = -GRAVITY
+        self.y_speed = GRAVITY
         self.health = health
 
 
@@ -52,10 +52,15 @@ class Player(Character):
     def shild_shot(self):
         pass
 
-    def move(self, delta_t, left=False, right=False, down=False):
+    def move(self, delta_t, left=False, right=False, down=False, up=False):
         if right:
             self.rect.x += self.x_speed * delta_t
         elif left:
             self.rect.x -= self.x_speed * delta_t
         elif down:
             self.rect.y -= self.y_speed * delta_t
+        elif up and pygame.sprite.spritecollideany(self, tiles_group):
+            self.rect.y -= self.y_speed * delta_t
+        else:
+            self.rect.y += self.y_speed * delta_t
+
