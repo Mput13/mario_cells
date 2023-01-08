@@ -1,8 +1,10 @@
 from tiles import Tile, Player
+import os
 
 
 def load_level(filename):
-    with open(filename, 'r') as mapFile:
+    fullname = os.path.join('maps', filename)
+    with open(fullname, 'r') as mapFile:
         level_map = [line.strip() for line in mapFile]
     return level_map
 
