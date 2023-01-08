@@ -128,7 +128,7 @@ class Arrow(DealingDamage):
 
     def enabling_gravity(self, delta_t):
         start_x = self.pos[0]
-        x = self.rect.center[0]
+        x = self.rect.center[0] - (self.rect.width // 2)
         if abs(start_x - x) >= self.flight_range:
             self.gravity_speed += delta_t * GRAVITY
 
@@ -174,7 +174,7 @@ class Bow(DealingDamage):
 
     def arrow_release(self):
         if self.animation.cur_frame == 12 and not self.arrow_fired:
-            pos = (self.pos[0] - Arrow.IMAGE_RIGHT.get_width() // 4,
+            pos = (self.pos[0],
                    self.pos[1] + self.rect.height // 2 - Arrow.IMAGE_RIGHT.get_height() // 2)
             arrow = Arrow(self.damage, self.crit_multiplier, self.crit_chance, pos, self.enemy_group, self.tiles_group,
                           self.flight_speed, self.flight_range, self.direction)
@@ -232,6 +232,7 @@ class Shield(pygame.sprite.Sprite):
             if event.button == self.button:
                 self.kill()
 
+
 pygame.init()
 window = pygame.display.set_mode((700, 700))
 clock = pygame.time.Clock()
@@ -250,8 +251,8 @@ while run:
                 s_r = Shield((360, 550), enemy_shells, event.button, RIGHT)
                 sw_l = Sword(1, 1, 1, (350, 150), enemy_group, 1, LEFT)
                 sw_r = Sword(1, 1, 1, (350, 150), enemy_group, 1, RIGHT)
-                b_r = Bow(1, 1, 1, (360, 350), enemy_group, wall, 2, 100, RIGHT)
-                b_l = Bow(1, 1, 1, (340, 350), enemy_group, wall, 2, 100, LEFT)
+                b_r = Bow(1, 1, 1, (400, 350), enemy_group, wall, 2, 100, RIGHT)
+                b_l = Bow(1, 1, 1, (300, 350), enemy_group, wall, 2, 100, LEFT)
 
         if event.type == pygame.QUIT:
             run = False
