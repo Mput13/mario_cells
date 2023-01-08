@@ -1,6 +1,6 @@
 import pygame
 
-from constants import WIDTH, HEIGHT, GRAVITY
+from constants import WIDTH, HEIGHT, GRAVITY, JUMP_SPEED
 from sprite_groups import all_sprites, boxes_group, tiles_group
 from utils import load_image
 
@@ -28,19 +28,20 @@ class QuestionBox(pygame.sprite.Sprite):
 
 
 class Character(pygame.sprite.Sprite):
-    def __init__(self, tile_type, pos_x, pos_y, *group, speed=200, health=100):
+    def __init__(self, tile_type, pos_x, pos_y, *group, speed=400, health=100):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite. Это очень важно !!!
         super().__init__(all_sprites)
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect()
         self.x_speed = speed
-        self.y_speed = -GRAVITY
+        self.y_speed = GRAVITY
         self.health = health
 
 
 class Player(Character):
     def __init__(self, pos_x, pos_y, *group):
         tile_type = 'player'
+        self.jump_count = -10
         super().__init__(tile_type, pos_x, pos_y, *group)
 
     def bow_shot(self):
@@ -52,10 +53,15 @@ class Player(Character):
     def shild_shot(self):
         pass
 
-    def move(self, delta_t, left=False, right=False, down=False):
+    def move(self, delta_t, left=False, right=False, down=False, up=False):
         if right:
             self.rect.x += self.x_speed * delta_t
         elif left:
             self.rect.x -= self.x_speed * delta_t
         elif down:
             self.rect.y -= self.y_speed * delta_t
+        elif up and pygame.sprite.spritecollideany(self, tiles_group):
+            self.rect.y -= self.y_speed * delta_t
+        else:
+            self.rect.y += self.y_speed * delta_t
+
