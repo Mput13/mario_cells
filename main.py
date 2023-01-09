@@ -1,7 +1,7 @@
 import collections
+import os
 
 import pygame
-
 from camera import Camera
 from values.constants import WIDTH, HEIGHT, FPS, GRAVITY
 from level_work import generate_level, load_level
@@ -12,7 +12,7 @@ from utils import load_image
 class Game:
     def __init__(self):
         self.running = False
-        self.background = load_image("background.png")
+        self.background = load_image("data/background.png")
         self.background = pygame.transform.scale(self.background, (WIDTH, HEIGHT))
         self.event_handlers = collections.defaultdict(list)
         self.player = None
@@ -27,7 +27,8 @@ class Game:
     def start(self):
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
         camera = Camera()
-        self.player = generate_level(load_level('maps/test_level.txt'))
+        print(load_level(f'maps/test_level.txt'))
+        self.player = generate_level(load_level(f'maps/test_level.txt'))
         self.running = True
         timer = pygame.time.Clock()
         self.running = True
@@ -48,6 +49,10 @@ class Game:
                 if callbacks := self.event_handlers[event.type]:
                     for callback in callbacks:
                         callback(event)
+            camera.update(self.player)
+            # обновляем положение всех спрайтов
+            for sprite in all_sprites:
+                camera.apply(sprite)
             screen.blit(self.background, (0, 0))
             all_sprites.draw(screen)
             self.update(screen, delta_t)
@@ -64,10 +69,10 @@ class Game:
             if pygame.sprite.spritecollideany(self.player, tiles_group):
                 self.is_jump = False
                 self.player.y_speed = 0
-            else:
                 self.player.y_speed = GRAVITY
+            else:
                 self.player.move(delta_t, down=True)
-                self.player.y_speed -= delta_t * 2000
+                self.player.y_speed -= delta_t * 1000
 
 
 game = Game()

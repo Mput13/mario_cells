@@ -1,9 +1,12 @@
 from tiles import Tile, Player
+from values.constants import WIDTH, HEIGHT, TILE_SIZE
 
 
 def load_level(filename):
+    filename = filename
+    # читаем уровень, убирая символы перевода строки
     with open(filename, 'r') as mapFile:
-        level_map = [line.strip() for line in mapFile]
+        level_map = [line for line in mapFile]
     return level_map
 
 
