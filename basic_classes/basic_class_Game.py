@@ -1,47 +1,97 @@
 import collections
-from typing import Callable
-
+from basic_classes.initial_screen import InitialScreen
+import sys
+import runpy
 import pygame
+from camera import Camera
+from values.constants import WIDTH, HEIGHT, FPS, GRAVITY, TILE_SIZE
+from level_work import generate_level, load_level
+from values.sprite_groups import all_sprites, tiles_group, door_group
+from utils import load_image, get_path
 
 
 class Game:
-    def __init__(self, width: int, height: int, screen, fps: int = 0):
-        self.height = height
-        self.width = width
-        self.fps = fps
-
+    def __init__(self):
         self.running = False
-
-        self.screen = screen
-
-        self.event_handlers: dict[int, list[Callable[[pygame.event.Event], None]]] = collections.defaultdict(list)
+        self.background = load_image("data/background.png")
+        self.background = pygame.transform.scale(self.background, (WIDTH, HEIGHT))
+        self.event_handlers = collections.defaultdict(list)
+        self.can_quit = False
+        self.player = None
+        self.is_jump = False
 
     def setup(self):
         pass
 
-    def register_event(self, event_type: int, action: Callable[[pygame.event.Event], None]):
+    def register_event(self, event_type, action):
         self.event_handlers[event_type].append(action)
 
     def start(self):
-
-        timer = pygame.time.Clock()
-
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        start_screen = InitialScreen(screen)
+        level_name = start_screen.start_screen()
+        camera = Camera()
+        self.player = generate_level(load_level(f'maps/{level_name}'))
         self.running = True
+        timer = pygame.time.Clock()
+        self.running = True
+        pygame.init()
+        font = pygame.font.Font(None, 20)
+        text1 = font.render('Чтобы перейти к выбору уровня нажмите "Q"', 1, (255, 0, 0))
         while self.running:
+            key = pygame.key.get_pressed()
+            delta_t = timer.tick(FPS) / 1000
+            if key[pygame.K_a]:
+                self.player.move(delta_t, left=True)
+            if key[pygame.K_d]:
+                self.player.move(delta_t, right=True)
+            if key[pygame.K_SPACE] and pygame.sprite.spritecollideany(self.player, tiles_group):
+                self.is_jump = True
+                self.player.rect.y -= 10
+                self.player.y_speed = -750
+            if key[pygame.K_q] and self.can_quit:
+                self.restart()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
                 if callbacks := self.event_handlers[event.type]:
                     for callback in callbacks:
                         callback(event)
-            delta_t = timer.tick(self.fps) / 1000
-            self.screen.fill(pygame.Color('black'))
-            self.draw(self.screen)
-            self.update(delta_t)
+            camera.update(self.player)
+            # обновляем положение всех спрайтов
+            for sprite in all_sprites:
+                camera.apply(sprite)
+            screen.blit(self.background, (0, 0))
+            if self.can_quit:
+                screen.blit(text1, (10, 50))
+            all_sprites.draw(screen)
+            self.update(screen, delta_t)
             pygame.display.flip()
 
-    def update(self, delta_t: float):
-        pass
+    def update(self, surface, delta_t):
+        if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y):
+            self.can_quit = True
+        else:
+            self.can_quit = False
+        if self.is_jump:
+            if pygame.sprite.spritecollideany(self.player, tiles_group):
+                self.is_jump = False
+            else:
+                self.player.move(delta_t)
+                self.player.y_speed += delta_t * 2000
+        else:
+            if pygame.sprite.spritecollideany(self.player, tiles_group):
+                self.is_jump = False
+                self.player.y_speed = GRAVITY
+            else:
+                self.player.move(delta_t, down=True)
+                self.player.y_speed -= delta_t * 1000
 
-    def draw(self, screen: pygame.Surface):
-        pass
+    def restart(self):
+        all_sprites.empty()
+        tiles_group.empty()
+        self.start()
+
+    def terminate(self):
+        pygame.quit()
+        sys.exit()

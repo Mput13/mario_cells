@@ -22,6 +22,18 @@ def load_image(name, colorkey=None):
     return image
 
 
+def get_files_in_directory(directory_name):
+    output = []
+    for root, dirs, files in os.walk(f'{os.getcwd()}\{directory_name}'):
+        for filename in files:
+            output.append(filename)
+    return output
+
+
+def get_path(file):
+    return f'{os.getcwd()}\{file}'
+
+
 Func = TypeVar('Func', bound=Callable)
 
 

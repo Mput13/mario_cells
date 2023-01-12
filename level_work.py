@@ -1,5 +1,6 @@
-from tiles import Tile, Player
+from tiles import Tile, Player, Door
 from values.constants import WIDTH, HEIGHT, TILE_SIZE
+from values.sprite_groups import door_group
 
 
 def load_level(filename):
@@ -19,4 +20,6 @@ def generate_level(level):
                 Tile('brick', x, y)
             elif level[y][x] == '@':
                 player = Player(x, y)
+            elif level[y][x] == 'D':
+                Tile('door', x, y, door_group)
     return player
