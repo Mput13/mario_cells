@@ -4,7 +4,7 @@ from pygame.sprite import AbstractGroup
 from basic_classes.basic_classes_for_animation import ActionAnimation
 from values.constants import GRAVITY, RIGHT, LEFT
 from values.sprite_groups import all_sprites, active_weapons_group
-from values.animation import BowAnimations
+from values.animations import BowAnimations
 from typing import Any
 
 
@@ -35,7 +35,7 @@ class DealingDamage(pygame.sprite.Sprite):
 
 
 class Sword(DealingDamage):
-    IMAGE = pygame.image.load("data/sword1.png")
+    IMAGE = pygame.image.load("data/weapons/sword.png")
 
     def __init__(self,
                  damage: int,
@@ -85,8 +85,8 @@ class Sword(DealingDamage):
 
 
 class Arrow(DealingDamage):
-    IMAGE_RIGHT = pygame.image.load("data/arrow_right.png")
-    IMAGE_LEFT = pygame.image.load("data/arrow_left.png")
+    IMAGE_RIGHT = pygame.image.load("data/weapons/arrow_right.png")
+    IMAGE_LEFT = pygame.image.load("data/weapons/arrow_left.png")
 
     def __init__(self,
                  damage: int,
@@ -193,8 +193,8 @@ class Bow(DealingDamage):
 
 
 class Shield(pygame.sprite.Sprite):
-    IMAGE_RIGHT = pygame.image.load("data/shield_right.png")
-    IMAGE_LEFT = pygame.image.load("data/shield_left.png")
+    IMAGE_RIGHT = pygame.image.load("data/weapons/shield_right.png")
+    IMAGE_LEFT = pygame.image.load("data/weapons/shield_left.png")
 
     def __init__(self,
                  pos: (int, int),

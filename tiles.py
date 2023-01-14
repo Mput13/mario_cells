@@ -29,7 +29,6 @@ class QuestionBox(pygame.sprite.Sprite):
 
 class Character(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *group, speed=400, health=100):
-        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite. Это очень важно !!!
         super().__init__(all_sprites)
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect()
