@@ -37,9 +37,10 @@ class QuestionBox(pygame.sprite.Sprite):
 class Character(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *group, speed=600, health=100):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite. Это очень важно !!!
-        super().__init__(all_sprites, player_group)
+        super().__init__(all_sprites)
         self.image = tile_images[tile_type]
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
         self.x_speed = speed
         self.y_speed = GRAVITY
         self.health = health
@@ -72,9 +73,4 @@ class Player(Character):
             self.rect.y += self.y_speed * delta_t
 
 
-class Door(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(tiles_group, all_sprites)
-        self.image = tile_images['door']
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
+

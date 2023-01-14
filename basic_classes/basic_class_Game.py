@@ -1,4 +1,6 @@
 import collections
+import os
+
 from basic_classes.initial_screen import InitialScreen
 import sys
 import runpy
@@ -7,7 +9,7 @@ from camera import Camera
 from values.constants import WIDTH, HEIGHT, FPS, GRAVITY, TILE_SIZE
 from level_work import generate_level, load_level
 from values.sprite_groups import all_sprites, tiles_group, door_group
-from utils import load_image, get_path
+from utils import load_image, get_path, get_files_in_directory
 
 
 class Game:
@@ -89,6 +91,7 @@ class Game:
 
     def restart(self):
         all_sprites.empty()
+        door_group.empty()
         tiles_group.empty()
         self.start()
 
