@@ -63,10 +63,7 @@ def top(A, B):
                 not A.rect.collidepoint(B.rect.midtop) and (
                 not A.rect.collidepoint(B.rect.topleft) or
                 not A.rect.collidepoint(B.rect.topright)):
-
-            # Check if B velocity moves to the top
-            if B.velocity.y < 0:
-                return True
+            return True
 
     # Instead return False
     return False

@@ -1,22 +1,20 @@
-from basic_classes_for_animation import ActionAnimatedSprite
-from basic_classes_for_collision import _Multiple
+from basic_classes.for_collision import _Multiple
 from utils import alive_only
+from basic_classes.for_animation import ActionAnimatedSprite
 from values.constants import GRAVITY, MAX_GRAVITY_SPEED
 import pygame
 
 
 class LiveObject(ActionAnimatedSprite):
-    def __init__(self, pos: (int, int), health, speed, tiles_group, direction, *groups):
-        super().__init__(*groups)
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+    def __init__(self, pos: (int, int), actions, start_action_name, health, speed, tiles_group, direction, *groups):
+        super().__init__(pos, actions, start_action_name, *groups)
         self.health = health
         self.speed = speed
         self.tiles_group = tiles_group
         self.direction = direction
-        self.y_speed = None
-        self.x_speed = None
-        self.is_death = False
+        self.y_speed = 0
+        self.x_speed = 0
+        self.is_dead = False
         self.directions_movement = self.selection_possible_directions_movement()
 
     def selection_possible_directions_movement(self):
@@ -40,24 +38,10 @@ class LiveObject(ActionAnimatedSprite):
                                "top": not any(top)}
         return directions_movement
 
-    def dead(self):
-        if self.health <= 0:
-            self.is_death = not self.is_death
-
     @alive_only
     def gravity(self, delta_t):
         if self.directions_movement["bottom"]:
             if self.y_speed < MAX_GRAVITY_SPEED:
                 self.y_speed += delta_t * GRAVITY
-        else:
-            self.y_speed = 0
-
-    @alive_only
-    def move(self):
-        pass
-
-    def update(self, *args: Any, **kwargs: Any) -> None:
-        super().update()
-        self.dead()
-        self.move()
-
+        elif not self.directions_movement["bottom"]:
+            self.y_speed = self.y_speed - self.y_speed
