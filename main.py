@@ -29,7 +29,6 @@ class Game:
         camera = Camera()
         self.player = generate_level(load_level('test_level.txt'))
         self.running = True
-        print(tiles_group.sprites())
         timer = pygame.time.Clock()
         self.running = True
         self.register_event(pygame.KEYDOWN, self.player.start_move)

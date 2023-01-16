@@ -49,7 +49,8 @@ class Sword(DealingDamage):
                  crit_chance: float,
                  enemy_group: AbstractGroup,
                  speed: float = 1,
-                 start_angele=10,
+                 start_angle=10,
+                 end_angle=90,
                  *group):
         super().__init__(damage, crit_multiplier, crit_chance, enemy_group, *group)
         self.enemy_group = enemy_group
@@ -57,9 +58,10 @@ class Sword(DealingDamage):
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.radius = self.image.get_rect().height // 2
-        self.start_angle = start_angele
-        self.angle = start_angele
+        self.start_angle = start_angle
+        self.angle = start_angle
         self.speed = speed
+        self.end_angle = end_angle
         self.mask = pygame.mask.from_surface(self.image)
         self.conflict_list = []
 
@@ -77,7 +79,7 @@ class Sword(DealingDamage):
         self.angle = self.angle + self.speed
 
     def stop_animation(self):
-        if self.angle >= 90:
+        if self.angle >= self.end_angle:
             self.kill()
             self.angle = self.start_angle
             self.conflict_list.clear()
@@ -199,8 +201,9 @@ class Bow(DealingDamage):
         self.choosing_direction()
         self.image = self.animation.image
         self.rect = self.animation.rect
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self.rect.x = pos[0] - self.rect.width // 2
+        self.rect.y = pos[1] - self.rect.height // 2
+        self.pos = (self.rect.x, self.rect.y)
         self.animation.set_play_single()
 
 
@@ -241,11 +244,11 @@ class Shield(pygame.sprite.Sprite):
                     self.is_attacking = False
 
     def attack(self, pos, direction, weapon_group: AbstractGroup):
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-        self.direction = direction
         self.selection_image()
+        self.direction = direction
         self.rect = self.image.get_rect()
+        self.rect.x = pos[0] + self.rect.width * self.direction
+        self.rect.y = pos[1] - self.rect.height // 2
         weapon_group.add(self)
         all_sprites.add(self)
         self.is_attacking = True

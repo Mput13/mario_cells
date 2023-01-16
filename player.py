@@ -20,6 +20,7 @@ class Player(LiveObject):
         self.weapon_2 = weapon_2
         self.enemy_group = enemy_group
         self.active_weapon = pygame.sprite.Group()
+        self.is_walking = False
 
     def switch_weapons(self):
         self.weapon_1, self.weapon_2 = self.weapon_2, self.weapon_1
@@ -40,57 +41,63 @@ class Player(LiveObject):
             self.x_speed = self.speed
             self.flip_right()
             self.direction = RIGHT
-        if event.key in (pygame.K_d, pygame.K_a) and not self.directions_movement["bottom"]:
-            self.switch_undirected("walk")
+        if event.key in (pygame.K_d, pygame.K_a):
+            self.is_walking = True
+            if self.collision_directions["bottom"]:
+                self.switch_undirected("walk")
 
     @alive_only
     def stop_move(self, event):
         if event.key in (pygame.K_a, pygame.K_d):
-            #            if pygame.key.get_pressed()[pygame.K_a]:
-            #                self.x_speed =
-            self.x_speed = 0
-            if not self.directions_movement["bottom"]:
-                self.switch_undirected("idle")
+            if pygame.key.get_pressed()[pygame.K_a]:
+                self.x_speed = -self.speed
+                self.flip_left()
+                self.direction = LEFT
+            elif pygame.key.get_pressed()[pygame.K_d]:
+                self.x_speed = self.speed
+                self.flip_right()
+                self.direction = RIGHT
+            else:
+                self.x_speed = 0
+                self.is_walking = False
+                if self.collision_directions["bottom"]:
+                    self.switch_undirected("idle")
 
     @alive_only
     def use_weapon(self, event):
-        #        if not self.directions_movement["bottom"]:
-        if not self.active_weapon:
-            button = event.button
-            if button in (pygame.BUTTON_RIGHT, pygame.BUTTON_LEFT):
-                if self.direction == RIGHT:
-                    coefficient = self.rect.width
-                else:
-                    coefficient = 0
-                pos = (self.rect.x + coefficient, self.rect.y - self.rect.height // 4)
-                if button == pygame.BUTTON_LEFT:
-                    self.weapon_1.attack(pos, self.direction, self.active_weapon)
-                elif button == pygame.BUTTON_RIGHT:
-                    self.weapon_2.attack(pos, self.direction, self.active_weapon)
+        if self.collision_directions["bottom"]:
+            if not self.active_weapon:
+                button = event.button
+                if button in (pygame.BUTTON_RIGHT, pygame.BUTTON_LEFT):
+                    if self.direction == RIGHT:
+                        coefficient = self.rect.width
+                    else:
+                        coefficient = 0
+                    pos = (self.rect.x + coefficient, self.rect.y + self.rect.height // 2)
+                    if button == pygame.BUTTON_LEFT:
+                        self.weapon_1.attack(pos, self.direction, self.active_weapon)
+                    elif button == pygame.BUTTON_RIGHT:
+                        self.weapon_2.attack(pos, self.direction, self.active_weapon)
 
     @alive_only
     def jump(self, event):
-        if event.key in (pygame.K_SPACE, pygame.K_w) and not self.directions_movement["bottom"]:
-            self.y_speed = JUMP_SPEED
-            self.switch_undirected("jump")
+        if not self.active_weapon:
+            if event.key in (pygame.K_SPACE, pygame.K_w) and self.collision_directions["bottom"]:
+                self.y_speed = JUMP_SPEED
 
-    @alive_only
-    def move(self, delta_t):
-        self.gravity(delta_t)
-        if self.active_weapon:
-            self.x_speed = 0
-        if self.x_speed > 0 and not self.directions_movement["right"]:
-            self.x_speed = 0
-        elif self.x_speed < 0 and not self.directions_movement["left"]:
-            self.x_speed = 0
-        if self.x_speed < 0 and not self.directions_movement["top"]:
-            self.y_speed = 0
-
-        if self.directions_movement["bottom"]:
+    def move(self):
+        if not self.collision_directions["bottom"]:
             self.switch_undirected("jump")
+        if self.collision_directions["bottom"]:
+            if self.is_walking:
+                self.switch_undirected("walk")
+            else:
+                self.switch_undirected("idle")
         self.rect.move_ip(self.x_speed, self.y_speed)
 
     def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
-        super().update()
-        self.selection_possible_directions_movement()
-        self.move(delta_t)
+        if self.active_weapon:
+            self.switch_undirected("idle")
+            self.rect.move_ip(-self.x_speed, 0)
+            self.move_edges(-self.x_speed, 0)
+        super().update(delta_t)
