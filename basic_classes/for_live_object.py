@@ -8,8 +8,8 @@ import pygame
 
 # Базовый класс с коллизией
 # коллизия просчитывается автоматически в дочерних классах нужно только переопределить метод move
-# если нужно сделать доп логику в update использовать super().update(), в начале если есть доп логика коллизии с миром
-# если такой логики нет то без можно в начале и в конце
+# если нужно добавить логику в update() можно использовать super()
+# или переопределить update но тогда добавить логику коллизий
 class LiveObject(ActionAnimatedSprite):
     def __init__(self, pos: (int, int), actions, start_action_name, health, speed, tiles_group, direction, *groups):
         super().__init__(pos, actions, start_action_name, *groups)
