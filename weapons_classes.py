@@ -6,6 +6,7 @@ from values.constants import GRAVITY, RIGHT, LEFT
 from values.sprite_groups import all_sprites
 from values.animations import BowAnimations
 from typing import Any
+from utils import alive_only
 
 
 class DealingDamage(pygame.sprite.Sprite):
@@ -119,6 +120,7 @@ class Arrow(DealingDamage):
         self.mask = pygame.mask.from_surface(self.image)
         self.gravity_speed = 0
         self.flight_range = flight_range
+        self.is_dead = False
 
     def selection_image(self):
         if self.direction == RIGHT:
@@ -131,12 +133,16 @@ class Arrow(DealingDamage):
         if collide is not None:
             collide.health -= self.get_damage()
             self.kill()
+            self.is_dead = True
 
+    @alive_only
     def collision_with_tiles(self):
         collide = pygame.sprite.spritecollide(self, self.tiles_group, False)
         if collide:
             self.kill()
+            self.is_dead = True
 
+    @alive_only
     def enabling_gravity(self, delta_t):
         start_x = self.pos[0]
         x = self.rect.center[0] - (self.rect.width // 2)

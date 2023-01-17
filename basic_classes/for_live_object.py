@@ -1,8 +1,9 @@
 from basic_classes.for_collision import CollisionsEdges
 from utils import alive_only
 from basic_classes.for_animation import ActionAnimatedSprite
-from values.constants import GRAVITY, MAX_GRAVITY_SPEED
+from values.constants import GRAVITY, MAX_GRAVITY_SPEED, WIDTH, HEIGHT
 from typing import Any
+from values.sprite_groups import all_sprites, enemy_group
 import pygame
 
 
@@ -73,10 +74,7 @@ class LiveObject(ActionAnimatedSprite):
     def move(self):
         pass
 
-    def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
-        super().update()
-        self.get_collision_directions()
-        self.gravity(delta_t)
+    def collision_with_world(self):
         if self.collision_directions["top"] and self.y_speed < 0:
             self.y_speed = 0
         if self.collision_directions["left"] and self.x_speed < 0:
@@ -86,5 +84,21 @@ class LiveObject(ActionAnimatedSprite):
             self.rect.move_ip(-self.x_speed, 0)
             self.move_edges(-self.x_speed, 0)
 
+    def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
+        super().update()
+        self.get_collision_directions()
+        self.gravity(delta_t)
+        self.collision_with_world()
         self.move()
         self.move_edges(self.x_speed, self.y_speed)
+
+
+class Enemy(LiveObject):
+    def __init__(self, pos, actions, start_action_name, health, speed, weapon, tiles_group, direction):
+        super().__init__(pos, actions, start_action_name, health, speed, tiles_group, direction, enemy_group,
+                         all_sprites)
+        self.weapon = weapon
+
+    def creating_field_of_view(self):
+        top = pygame.sprite.Sprite()
+        top.rect = pygame.Rect(self.rect.center[0], self.rect.center[1] - HEIGHT // 2, 1, HEIGHT // 2)
