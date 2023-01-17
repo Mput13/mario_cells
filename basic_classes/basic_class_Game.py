@@ -1,9 +1,7 @@
 import collections
-import os
 
 from basic_classes.initial_screen import InitialScreen
 import sys
-import runpy
 import pygame
 from camera import Camera
 from values.constants import WIDTH, HEIGHT, FPS, GRAVITY, TILE_SIZE
@@ -29,11 +27,20 @@ class Game:
         self.event_handlers[event_type].append(action)
 
     def start(self):
+        pygame.init()
+        pygame.mixer.music.load('data/dooms_gate.wav')
+        pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(0.5)
+        jump_sound = pygame.mixer.Sound('data/jump_sound.wav')
+        jump_sound.set_volume(0.1)
+        self.death_sound = pygame.mixer.Sound('data/death_sound.wav')
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
         start_screen = InitialScreen(screen)
         level_name = start_screen.start_screen()
         camera = Camera()
-        self.player = generate_level(load_level(f'maps/{level_name}'))
+        x = generate_level(load_level(f'maps/{level_name}'))
+        self.player = x[0]
+        self.max_y = x[1]
         self.running = True
         timer = pygame.time.Clock()
         self.running = True
@@ -48,6 +55,7 @@ class Game:
             if key[pygame.K_d]:
                 self.player.move(delta_t, right=True)
             if key[pygame.K_SPACE] and pygame.sprite.spritecollideany(self.player, tiles_group):
+                jump_sound.play()
                 self.is_jump = True
                 self.player.rect.y -= 10
                 self.player.y_speed = -750
@@ -71,6 +79,9 @@ class Game:
             pygame.display.flip()
 
     def update(self, surface, delta_t):
+        if self.player.rect.y > self.max_y + 200:
+            self.death_sound.play()
+            self.restart()
         if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y):
             self.can_quit = True
         else:

@@ -22,4 +22,4 @@ def generate_level(level):
                 player = Player(x, y, player_group)
             elif level[y][x] == 'D':
                 Tile('door', x, y, door_group)
-    return player
+    return player, y * TILE_SIZE
