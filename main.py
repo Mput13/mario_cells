@@ -10,7 +10,7 @@ from values.sprite_groups import all_sprites, door_group, tiles_group, player_gr
     active_weapons_group, enemy_shells
 from utils import load_image
 
-
+# rssrt
 class Game:
     def __init__(self):
         self.running = False
