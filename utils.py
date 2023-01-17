@@ -6,7 +6,7 @@ import pygame
 
 
 def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
+    fullname = os.path.join(name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -20,6 +20,18 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+def get_files_in_directory(directory_name):
+    output = []
+    for root, dirs, files in os.walk(f'{os.getcwd()}\{directory_name}'):
+        for filename in files:
+            output.append(filename)
+    return output
+
+
+def get_path(file):
+    return f'{os.getcwd()}\{file}'
 
 
 Func = TypeVar('Func', bound=Callable)
