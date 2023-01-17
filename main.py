@@ -10,6 +10,7 @@ from values.sprite_groups import all_sprites, door_group, tiles_group, player_gr
     active_weapons_group, enemy_shells
 from utils import load_image
 
+
 # rssrt
 class Game:
     def __init__(self):
@@ -56,16 +57,16 @@ class Game:
                         callback(event)
                 if self.can_quit:
                     screen.blit(text1, (10, 50))
-            # camera.update(self.player)
+            camera.update(self.player)
             screen.blit(self.background, (0, 0))
             all_sprites.draw(screen)
             self.update(screen, delta_t)
-            # for sprite in all_sprites:
-            #     camera.apply(sprite)
+            for sprite in all_sprites:
+                camera.apply(sprite)
             pygame.display.flip()
 
     def update(self, surface, delta_t):
-        if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y)\
+        if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y) \
                 or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y):
             self.can_quit = True
         all_sprites.update(delta_t)

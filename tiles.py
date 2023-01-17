@@ -1,6 +1,5 @@
 import pygame
 
-from colisions import bottom
 from values.constants import WIDTH, HEIGHT, GRAVITY, TILE_SIZE
 from values.sprite_groups import all_sprites, boxes_group, tiles_group, player_group
 from utils import load_image
