@@ -1,4 +1,5 @@
 from basic_classes.for_live_object import LiveObject
+from sounds import jump_sound
 from values.constants import RIGHT, LEFT, GRAVITY, JUMP_SPEED
 from values.sprite_groups import all_sprites, player_group
 from values.animations import PlayerAnimations
@@ -84,6 +85,7 @@ class Player(LiveObject):
         if not self.active_weapon:
             if event.key in (pygame.K_SPACE, pygame.K_w) and self.collision_directions["bottom"]:
                 self.y_speed = JUMP_SPEED
+                jump_sound.play()
 
     def move(self):
         if not self.collision_directions["bottom"]:

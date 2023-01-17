@@ -7,7 +7,8 @@ import os
 
 
 def load_level(filename):
-    fullname = os.path.join('maps', filename)
+    fullname = f'{os.getcwd()}\maps\{filename}'
+    print(fullname)
     with open(fullname, 'r') as mapFile:
         level_map = [line.strip() for line in mapFile]
     return level_map

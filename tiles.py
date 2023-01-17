@@ -6,10 +6,9 @@ from values.sprite_groups import all_sprites, boxes_group, tiles_group, player_g
 from utils import load_image
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-tile_images = {'block': load_image('data/block.png'), 'question_block': load_image('data/question_block.png'),
-               'brick': load_image('data/brick.png'), 'player': load_image('data/characters/mario.png'),
-               'door': load_image('data/door.png')}
-player_image = load_image('data/characters/mario.png')
+tile_images = {'block': load_image('data/world/block.png'), 'question_block': load_image('data/world/question_block.png'),
+               'brick': load_image('data/world/brick.png'),
+               'door': load_image('data/world/door.png')}
 tile_width = tile_height = TILE_SIZE
 
 
