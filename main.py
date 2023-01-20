@@ -7,7 +7,7 @@ from camera import Camera
 from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE
 from level_work import generate_level, load_level
 from values.sprite_groups import all_sprites, door_group, tiles_group, player_group, boxes_group, enemy_group, \
-    active_weapons_group, enemy_shells
+    active_weapons_group, enemy_shells, invisible_objects_group
 from utils import load_image
 
 
@@ -62,6 +62,8 @@ class Game:
             all_sprites.draw(screen)
             self.update(screen, delta_t)
             for sprite in all_sprites:
+                camera.apply(sprite)
+            for sprite in invisible_objects_group:
                 camera.apply(sprite)
             pygame.display.flip()
 

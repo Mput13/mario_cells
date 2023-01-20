@@ -1,15 +1,16 @@
 from basic_classes.for_collision import CollisionsEdges
 from utils import alive_only
 from basic_classes.for_animation import ActionAnimatedSprite
-from values.constants import GRAVITY, MAX_GRAVITY_SPEED
+from values.constants import GRAVITY, MAX_GRAVITY_SPEED, WIDTH, HEIGHT
 from typing import Any
+from values.sprite_groups import all_sprites, enemy_group
 import pygame
 
 
 # Базовый класс с коллизией
 # коллизия просчитывается автоматически в дочерних классах нужно только переопределить метод move
-# если нужно сделать доп логику в update использовать super().update(), в начале если есть доп логика коллизии с миром
-# если такой логики нет то без можно в начале и в конце
+# если нужно добавить логику в update() можно использовать super()
+# или переопределить update но тогда добавить логику коллизий
 class LiveObject(ActionAnimatedSprite):
     def __init__(self, pos: (int, int), actions, start_action_name, health, speed, tiles_group, direction, *groups):
         super().__init__(pos, actions, start_action_name, *groups)
@@ -73,10 +74,8 @@ class LiveObject(ActionAnimatedSprite):
     def move(self):
         pass
 
-    def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
-        super().update()
+    def collision_with_world(self):
         self.get_collision_directions()
-        self.gravity(delta_t)
         if self.collision_directions["top"] and self.y_speed < 0:
             self.y_speed = 0
         if self.collision_directions["left"] and self.x_speed < 0:
@@ -86,5 +85,20 @@ class LiveObject(ActionAnimatedSprite):
             self.rect.move_ip(-self.x_speed, 0)
             self.move_edges(-self.x_speed, 0)
 
+    def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
+        super().update()
+        self.collision_with_world()
+        self.gravity(delta_t)
         self.move()
         self.move_edges(self.x_speed, self.y_speed)
+
+
+class Enemy(LiveObject):
+    def __init__(self, pos, actions, start_action_name, health, speed, weapon, tiles_group, direction):
+        super().__init__(pos, actions, start_action_name, health, speed, tiles_group, direction, enemy_group,
+                         all_sprites)
+        self.weapon = weapon
+
+    def creating_field_of_view(self):
+        top = pygame.sprite.Sprite()
+        top.rect = pygame.Rect(self.rect.center[0], self.rect.center[1] - HEIGHT // 2, 1, HEIGHT // 2)
