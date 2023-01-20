@@ -1,12 +1,12 @@
 import pygame
 from values.sprite_groups import invisible_objects_group
+from values.constants import HEIGHT, WIDTH
 
 
 # в этот класс кидаем rect.x и rect.y первоначального расположения спрайта и его размеры
 # класс выдаст 4 прямоугольника, которые будут находится со всех сторон спрайта
 # после эти прямоугольники используем для коллизии с миром
 class CollisionsEdges:
-    IMAGE = pygame.image.load("data/crutch_for_edge_of_collision.png")
 
     def __init__(self, pos: (int, int), height, wight):
         self.pos = pos
@@ -50,3 +50,35 @@ class CollisionsEdges:
                      "bottom": self.creating_bottom_edge(),
                      "right": self.creating_right_edge()}
         return all_edges
+
+
+class FieldViewEnemy:
+    def __init__(self, pos: (int, int)):
+        self.pos = pos
+        self.wight_vertical_field = 1
+        self.height_horizontal_field = 1
+
+    def creating_vertical_field(self):
+        vertical = pygame.sprite.Sprite(invisible_objects_group)
+        vertical.rect = pygame.Rect(self.pos[0], 0,
+                                    self.wight_vertical_field, HEIGHT)
+        return vertical
+
+    def creating_left_field(self):
+        left = pygame.sprite.Sprite(invisible_objects_group)
+        left.rect = pygame.Rect(0, self.pos[1],
+                                WIDTH // 2, self.height_horizontal_field)
+        return left
+
+    def creating_right_field(self):
+        right = pygame.sprite.Sprite(invisible_objects_group)
+        right.rect = pygame.Rect(self.pos[0], self.pos[1],
+                                 WIDTH // 2, self.height_horizontal_field)
+        return right
+
+    def creating_all_field(self):
+        all_field = {"vertical": self.creating_vertical_field(),
+                     "left": self.creating_left_field(),
+                     "right": self.creating_right_field()
+                     }
+        return all_field

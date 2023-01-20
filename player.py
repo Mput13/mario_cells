@@ -1,4 +1,4 @@
-from basic_classes.for_live_object import LiveObject
+from basic_classes.for_live_object_and_enemy import LiveObject
 from sounds import jump_sound
 from values.constants import RIGHT, LEFT, GRAVITY, JUMP_SPEED
 from values.sprite_groups import all_sprites, player_group

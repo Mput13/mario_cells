@@ -1,9 +1,9 @@
-from basic_classes.for_collision import CollisionsEdges
+from basic_classes.for_collision_and_field_view_enemies import CollisionsEdges, FieldViewEnemy
 from utils import alive_only
 from basic_classes.for_animation import ActionAnimatedSprite
-from values.constants import GRAVITY, MAX_GRAVITY_SPEED, WIDTH, HEIGHT
+from values.constants import GRAVITY, MAX_GRAVITY_SPEED, RIGHT, LEFT
 from typing import Any
-from values.sprite_groups import all_sprites, enemy_group
+from values.sprite_groups import all_sprites, enemy_group, player_group
 import pygame
 
 
@@ -98,7 +98,38 @@ class Enemy(LiveObject):
         super().__init__(pos, actions, start_action_name, health, speed, tiles_group, direction, enemy_group,
                          all_sprites)
         self.weapon = weapon
+        self.is_player_found = False
+        self.player_pos = None
 
-    def creating_field_of_view(self):
-        top = pygame.sprite.Sprite()
-        top.rect = pygame.Rect(self.rect.center[0], self.rect.center[1] - HEIGHT // 2, 1, HEIGHT // 2)
+    def creating_field_view(self):
+        creator_field_view = FieldViewEnemy(self.rect.center)
+        field_view = creator_field_view.creating_all_field()
+        self.right_field_view = field_view["right"]
+        self.left_field_view = field_view["left"]
+        self.vertical_field_view = field_view["vertical"]
+
+    def player_search(self):
+        if pygame.sprite.spritecollideany(self.left_field_view, player_group, False):
+            self.player_pos = LEFT
+            self.x_speed = -self.speed
+            self.is_player_found = True
+        elif pygame.sprite.spritecollideany(self.right_field_view, player_group, False):
+            self.player_pos = RIGHT
+            self.x_speed = self.speed
+            self.is_player_found = True
+
+    def switch_direction_movement(self):
+        if self.is_player_found:
+            if self.player_pos == RIGHT and self.x_speed > 0:
+                if pygame.sprite.collide_rect(self.vertical_field_view,
+                                              player_group.sprites()[0].right_edge):
+                    self.player_pos = LEFT
+                    self.x_speed = -self.x_speed
+            if self.player_pos == LEFT and self.x_speed < 0:
+                if pygame.sprite.collide_rect(player_group.sprites()[0].left_edge,
+                                              self.vertical_field_view):
+                    self.player_pos = RIGHT
+                    self.x_speed = -self.x_speed
+
+    def player_harassment(self):
+        pass
