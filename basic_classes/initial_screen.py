@@ -20,6 +20,9 @@ class InitialScreen:
 
     def start_screen(self):
         pygame.init()
+        pygame.mixer.music.load('data/dooms_gate.wav')
+        pygame.mixer.music.play(999)
+        pygame.mixer.music.set_volume(0.5)
         self.intro_text = ['Выберите уровень:']
         for el in get_files_in_directory('maps'):
             self.intro_text.append(el)
@@ -44,6 +47,7 @@ class InitialScreen:
                     self.terminate()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if 'txt' in str(self.get_chosen_level(pygame.mouse.get_pos())):
+                        pygame.mixer.music.unload()
                         return self.get_chosen_level(pygame.mouse.get_pos())
             pygame.display.flip()
             clock.tick(FPS)
@@ -52,11 +56,3 @@ class InitialScreen:
         for line in self.intro_text:
             if self.buttons[line].collidepoint(mouse_cords):
                 return line
-#
-# print(f'{os.getcwd().replace("basic_classes", "")}maps')
-# output = ['xfgsdfgf']
-# for root, dirs, files in os.walk(f'{os.getcwd().replace("basic_classes", "")}maps'):
-#     for filename in files:
-#         output.append(filename)
-#         print(filename)
-# print(output)

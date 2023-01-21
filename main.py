@@ -29,13 +29,13 @@ class Game:
         self.event_handlers[event_type].append(action)
 
     def start(self):
-        pygame.init()
-        pygame.mixer.music.load('data/dooms_gate.wav')
-        pygame.mixer.music.play()
-        pygame.mixer.music.set_volume(0.5)
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
         start_screen = InitialScreen(screen)
         level_name = start_screen.start_screen()
+        pygame.init()
+        pygame.mixer.music.load('data/fear.wav')
+        pygame.mixer.music.play(999)
+        pygame.mixer.music.set_volume(0.3)
         self.player = generate_level(load_level(level_name))
         self.running = True
         font = pygame.font.Font(None, 20)
@@ -45,7 +45,6 @@ class Game:
         self.register_event(pygame.KEYUP, self.player.stop_move)
         self.register_event(pygame.KEYDOWN, self.player.jump)
         self.register_event(pygame.MOUSEBUTTONDOWN, self.player.use_weapon)
-        self.register_event(pygame.K_q, self.back_to_menu)
         camera = Camera()
         while self.running:
             delta_t = timer.tick(FPS) / 1000
@@ -55,10 +54,13 @@ class Game:
                 if callbacks := self.event_handlers[event.type]:
                     for callback in callbacks:
                         callback(event)
-                if self.can_quit:
-                    screen.blit(text1, (10, 50))
+            key = pygame.key.get_pressed()
+            if key[pygame.K_q] and self.can_quit:
+                self.restart()
             camera.update(self.player)
             screen.blit(self.background, (0, 0))
+            if self.can_quit:
+                screen.blit(text1, (10, 50))
             all_sprites.draw(screen)
             self.update(screen, delta_t)
             for sprite in all_sprites:
@@ -69,13 +71,12 @@ class Game:
 
     def update(self, surface, delta_t):
         if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y) \
-                or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y):
+                or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y) \
+                or door_group.sprites()[0].rect.x < self.player.rect.x + TILE_SIZE * 2:
             self.can_quit = True
+        else:
+            self.can_quit = False
         all_sprites.update(delta_t)
-
-    def back_to_menu(self):
-        if self.can_quit:
-            self.restart()
 
     def restart(self):
         all_sprites.empty()
@@ -86,6 +87,7 @@ class Game:
         active_weapons_group.empty()
         enemy_shells.empty()
         door_group.empty()
+        pygame.mixer.music.unload()
         self.start()
 
 
