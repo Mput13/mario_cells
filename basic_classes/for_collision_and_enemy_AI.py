@@ -1,5 +1,5 @@
 import pygame
-from values.sprite_groups import invisible_objects_group
+from values.sprite_groups import invisible_objects_group, all_sprites
 from values.constants import HEIGHT, WIDTH
 
 
@@ -52,28 +52,35 @@ class CollisionsEdges:
         return all_edges
 
 
+# создаст поле зрения врага, передавать rect.center
 class FieldViewEnemy:
     def __init__(self, pos: (int, int)):
         self.pos = pos
-        self.wight_vertical_field = 1
-        self.height_horizontal_field = 1
+        self.wight_vertical_field = 11
+        self.height_horizontal_field = 5
 
     def creating_vertical_field(self):
-        vertical = pygame.sprite.Sprite(invisible_objects_group)
-        vertical.rect = pygame.Rect(self.pos[0], 0,
+        vertical = pygame.sprite.Sprite(all_sprites)
+        vertical.rect = pygame.Rect(self.pos[0] - self.wight_vertical_field // 2, self.pos[1] - HEIGHT // 2,
                                     self.wight_vertical_field, HEIGHT)
+        vertical.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
+                                                (self.wight_vertical_field, HEIGHT))
         return vertical
 
     def creating_left_field(self):
-        left = pygame.sprite.Sprite(invisible_objects_group)
-        left.rect = pygame.Rect(0, self.pos[1],
+        left = pygame.sprite.Sprite(all_sprites)
+        left.rect = pygame.Rect(self.pos[0] - WIDTH // 2, self.pos[1] - self.height_horizontal_field // 2,
                                 WIDTH // 2, self.height_horizontal_field)
+        left.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
+                                            (WIDTH // 2, self.height_horizontal_field))
         return left
 
     def creating_right_field(self):
-        right = pygame.sprite.Sprite(invisible_objects_group)
-        right.rect = pygame.Rect(self.pos[0], self.pos[1],
+        right = pygame.sprite.Sprite(all_sprites)
+        right.rect = pygame.Rect(self.pos[0], self.pos[1] - self.height_horizontal_field // 2,
                                  WIDTH // 2, self.height_horizontal_field)
+        right.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
+                                             (WIDTH // 2, self.height_horizontal_field))
         return right
 
     def creating_all_field(self):
@@ -82,3 +89,29 @@ class FieldViewEnemy:
                      "right": self.creating_right_field()
                      }
         return all_field
+
+
+# класс который создаст два спрайта для того чтобы можно было смотреть идёт ли враг в пропасть,
+# передавать rect.x и rect.y и размеры спрайта
+class SearchVoid:
+    def __init__(self, pos: (int, int), wight, height):
+        self.x = pos[0]
+        self.y = pos[1]
+        self.wight = wight
+        self.height = height
+        self.indent_x = 5
+        self.indent_y = 5
+
+    def creating_search_engine(self):
+        y = self.y + self.height + self.indent_y
+        left = pygame.sprite.Sprite(all_sprites)
+        left.rect = pygame.Rect(self.x - self.indent_x, y, 1, 1)
+        left.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
+                                            (1, 1))
+        right = pygame.sprite.Sprite(all_sprites)
+        right.rect = pygame.Rect(self.x + self.wight + self.indent_x, y, 1, 1)
+        right.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
+                                            (1, 1))
+        all_search_engine = {"left": left,
+                             "right": right}
+        return all_search_engine
