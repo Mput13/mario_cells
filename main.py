@@ -4,10 +4,11 @@ import pygame
 
 from basic_classes.initial_screen import InitialScreen
 from camera import Camera
+from sounds import death_sound
 from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE
 from level_work import generate_level, load_level
 from values.sprite_groups import all_sprites, door_group, tiles_group, player_group, boxes_group, enemy_group, \
-    active_weapons_group, enemy_shells, invisible_objects_group
+    active_weapons_group, enemy_shells, invisible_objects_group, hollow_group
 from utils import load_image
 
 
@@ -21,6 +22,7 @@ class Game:
         self.player = None
         self.is_jump = False
         self.can_quit = False
+        self.max_y = 999999
 
     def setup(self):
         pass
@@ -76,9 +78,13 @@ class Game:
             self.can_quit = True
         else:
             self.can_quit = False
+        if pygame.sprite.spritecollideany(self.player, hollow_group):
+            death_sound.play()
+            self.restart()
         all_sprites.update(delta_t)
 
     def restart(self):
+        hollow_group.empty()
         all_sprites.empty()
         tiles_group.empty()
         player_group.empty()

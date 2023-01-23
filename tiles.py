@@ -7,7 +7,7 @@ from utils import load_image
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 tile_images = {'block': load_image('data/world/block.png'), 'question_block': load_image('data/world/question_block.png'),
                'brick': load_image('data/world/brick.png'),
-               'door': load_image('data/world/door.png')}
+               'door': load_image('data/world/door.png'), 'hollow': load_image('data/world/hollow.png')}
 tile_width = tile_height = TILE_SIZE
 
 

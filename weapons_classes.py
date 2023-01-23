@@ -88,12 +88,20 @@ class Sword(DealingDamage):
             self.is_attacking = False
 
     def dealing_damage(self):
-        sword_sound.play()
         collide = pygame.sprite.spritecollide(self, self.enemy_group, False, pygame.sprite.collide_mask)
         for enemy in collide:
             if enemy not in self.conflict_list:
                 self.conflict_list.append(enemy)
                 enemy.health -= self.get_damage()
+
+    def attack(self, pos, direction, weapon_group: AbstractGroup):
+        sword_sound.play()
+        self.direction = direction
+        self.pos = pos
+        weapon_group.add(self)
+        all_sprites.add(self)
+        self.is_attacking = True
+
 
 
 class Arrow(DealingDamage):
