@@ -24,6 +24,7 @@ class LiveObject(ActionAnimatedSprite):
         self.is_dead = False
         self.creating_edges()
         self.collision_directions = None
+        self.active_weapon = pygame.sprite.Group()
 
     def creating_edges(self):
         creator_edges = CollisionsEdges((self.rect.x, self.rect.y), self.rect.height, self.rect.width)
@@ -46,6 +47,7 @@ class LiveObject(ActionAnimatedSprite):
     def dead(self):
         if self.health <= 0:
             self.is_dead = True
+            self.kill()
 
     def move_edges(self, x, y):
         self.top_edge.rect.move_ip(x, y)
@@ -91,12 +93,13 @@ class LiveObject(ActionAnimatedSprite):
         super().update()
         self.collision_with_world()
         self.gravity(delta_t)
+        self.dead()
         self.move()
         self.move_edges(self.x_speed, self.y_speed)
 
 
 class Enemy(LiveObject):
-    def __init__(self, pos, health, speed, weapon, tiles_group, player_group):
+    def __init__(self, pos, health, speed, weapon, cooldown_attack, tiles_group, player_group):
         self.animations: dict[BowAnimations, BowAnimations] = {
             animation.name: animation.value for animation in BowAnimations
         }
@@ -109,6 +112,8 @@ class Enemy(LiveObject):
         self.is_player_found = False
         self.player_group = player_group
         self.timer_attack = 0
+        self.cooldown_attack = cooldown_attack * 1000
+        self.ready_attack = False
 
     def switch_direction(self):
         self.x_speed *= -1
@@ -211,7 +216,10 @@ class Enemy(LiveObject):
             self.rect.move_ip(-self.x_speed, 0)
             self.move_edges(-self.x_speed, 0)
             self.move_field_view(-self.x_speed, 0)
-            self.move_search_engine_void(-self.x_speed, self.y_speed)
+            self.move_search_engine_void(-self.x_speed, 0)
+    def collision_with_player(self):
+        if pygame.sprite.spritecollideany(self, self.player_group):
+
 
     def gravity(self, delta_t):
         if self.collision_directions["bottom"] and self.y_speed > 0:
@@ -233,3 +241,24 @@ class Enemy(LiveObject):
         self.move_field_view(self.x_speed, self.y_speed)
         self.move_search_engine_void(self.x_speed, self.y_speed)
         self.player_harassment()
+        self.update_ready_attack(delta_t)
+
+    def update_ready_attack(self, delta_t):
+        if not self.ready_attack:
+            self.timer_attack += delta_t
+        if self.timer_attack >= self.cooldown_attack:
+            self.timer_attack = 0
+            self.ready_attack = True
+
+    def attack(self):
+        if self.ready_attack:
+            if self.direction == RIGHT:
+                coefficient = self.rect.width
+            else:
+                coefficient = 0
+            pos = (self.rect.x + coefficient, self.rect.y + self.rect.height // 2)
+            self.weapon.attack(pos, self.direction, self.active_weapon)
+
+
+class EnemyWithCloseCombat(Enemy):
+    pass

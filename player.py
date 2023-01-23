@@ -20,7 +20,6 @@ class Player(LiveObject):
         self.weapon_1 = weapon_1
         self.weapon_2 = weapon_2
         self.enemy_group = enemy_group
-        self.active_weapon = pygame.sprite.Group()
         self.is_walking = False
 
     def switch_weapons(self):

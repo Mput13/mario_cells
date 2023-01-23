@@ -128,6 +128,7 @@ class Arrow(DealingDamage):
         else:
             self.image = Arrow.IMAGE_LEFT
 
+    @alive_only
     def dealing_damage(self):
         collide = pygame.sprite.spritecollideany(self, self.enemy_group)
         if collide is not None:

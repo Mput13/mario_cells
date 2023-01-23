@@ -60,27 +60,21 @@ class FieldViewEnemy:
         self.height_horizontal_field = 5
 
     def creating_vertical_field(self):
-        vertical = pygame.sprite.Sprite(all_sprites)
+        vertical = pygame.sprite.Sprite(invisible_objects_group)
         vertical.rect = pygame.Rect(self.pos[0] - self.wight_vertical_field // 2, self.pos[1] - HEIGHT // 2,
                                     self.wight_vertical_field, HEIGHT)
-        vertical.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
-                                                (self.wight_vertical_field, HEIGHT))
         return vertical
 
     def creating_left_field(self):
-        left = pygame.sprite.Sprite(all_sprites)
+        left = pygame.sprite.Sprite(invisible_objects_group)
         left.rect = pygame.Rect(self.pos[0] - WIDTH // 2, self.pos[1] - self.height_horizontal_field // 2,
                                 WIDTH // 2, self.height_horizontal_field)
-        left.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
-                                            (WIDTH // 2, self.height_horizontal_field))
         return left
 
     def creating_right_field(self):
-        right = pygame.sprite.Sprite(all_sprites)
+        right = pygame.sprite.Sprite(invisible_objects_group)
         right.rect = pygame.Rect(self.pos[0], self.pos[1] - self.height_horizontal_field // 2,
                                  WIDTH // 2, self.height_horizontal_field)
-        right.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
-                                             (WIDTH // 2, self.height_horizontal_field))
         return right
 
     def creating_all_field(self):
@@ -104,14 +98,25 @@ class SearchVoid:
 
     def creating_search_engine(self):
         y = self.y + self.height + self.indent_y
-        left = pygame.sprite.Sprite(all_sprites)
+        left = pygame.sprite.Sprite(invisible_objects_group)
         left.rect = pygame.Rect(self.x - self.indent_x, y, 1, 1)
-        left.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
-                                            (1, 1))
-        right = pygame.sprite.Sprite(all_sprites)
+        right = pygame.sprite.Sprite(invisible_objects_group)
         right.rect = pygame.Rect(self.x + self.wight + self.indent_x, y, 1, 1)
-        right.image = pygame.transform.scale(pygame.image.load("data/world/question_block.png"),
-                                            (1, 1))
         all_search_engine = {"left": left,
                              "right": right}
         return all_search_engine
+
+#создаёт поле атаки врага передавать rect.center
+#class AttackField:
+#    def __init__(self, pos, radius):
+#        self.x = pos[0]
+#        self.y = pos[1]
+#        self.radius = radius
+#        self.height = 1
+#
+#    def creating_field_close_combat(self):
+#        attack_field = pygame.sprite.Sprite(invisible_objects_group)
+#
+#    def creating_field_ranged_combat(self):
+#        attack_field = pygame.sprite.Sprite(invisible_objects_group)
+#        attack_field.rect = pygame.Rect()
