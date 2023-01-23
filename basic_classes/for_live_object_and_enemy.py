@@ -1,9 +1,10 @@
-from basic_classes.for_collision_and_field_view_enemies import CollisionsEdges, FieldViewEnemy
+from basic_classes.for_collision_and_enemy_AI import CollisionsEdges, FieldViewEnemy, SearchVoid
 from utils import alive_only
 from basic_classes.for_animation import ActionAnimatedSprite
-from values.constants import GRAVITY, MAX_GRAVITY_SPEED, RIGHT, LEFT
+from values.constants import GRAVITY, MAX_GRAVITY_SPEED, RIGHT, LEFT, JUMP_SPEED
+from values.animations import PlayerAnimations, BowAnimations
 from typing import Any
-from values.sprite_groups import all_sprites, enemy_group, player_group
+from values.sprite_groups import all_sprites, enemy_group
 import pygame
 
 
@@ -34,8 +35,9 @@ class LiveObject(ActionAnimatedSprite):
 
     def gravity(self, delta_t):
         if self.collision_directions["bottom"] and self.y_speed > 0:
-            self.rect.move_ip(0, -self.y_speed * delta_t)
-            self.move_edges(0, -self.y_speed * delta_t)
+            speed = -self.y_speed * delta_t
+            self.rect.move_ip(0, speed)
+            self.move_edges(0, speed)
             self.y_speed = 0
         else:
             if self.y_speed < MAX_GRAVITY_SPEED:
@@ -94,12 +96,23 @@ class LiveObject(ActionAnimatedSprite):
 
 
 class Enemy(LiveObject):
-    def __init__(self, pos, actions, start_action_name, health, speed, weapon, tiles_group, direction):
-        super().__init__(pos, actions, start_action_name, health, speed, tiles_group, direction, enemy_group,
-                         all_sprites)
+    def __init__(self, pos, health, speed, weapon, tiles_group, player_group):
+        self.animations: dict[BowAnimations, BowAnimations] = {
+            animation.name: animation.value for animation in BowAnimations
+        }
+        super().__init__(pos, self.animations, BowAnimations.shot_right.name, health, speed, tiles_group, RIGHT,
+                         enemy_group, all_sprites)
         self.weapon = weapon
+        self.creating_field_view()
+        self.creating_search_engine_void()
+        self.x_speed = self.speed
         self.is_player_found = False
-        self.player_pos = None
+        self.player_group = player_group
+        self.timer_attack = 0
+
+    def switch_direction(self):
+        self.x_speed *= -1
+        self.direction *= -1
 
     def creating_field_view(self):
         creator_field_view = FieldViewEnemy(self.rect.center)
@@ -108,28 +121,115 @@ class Enemy(LiveObject):
         self.left_field_view = field_view["left"]
         self.vertical_field_view = field_view["vertical"]
 
+    def creating_search_engine_void(self):
+        creator = SearchVoid((self.rect.x, self.rect.y), self.rect.width, self.rect.height)
+        all_search_engine = creator.creating_search_engine()
+        self.right_search_engine_void = all_search_engine["right"]
+        self.left_search_engine_void = all_search_engine["left"]
+
     def player_search(self):
-        if pygame.sprite.spritecollideany(self.left_field_view, player_group, False):
-            self.player_pos = LEFT
-            self.x_speed = -self.speed
-            self.is_player_found = True
-        elif pygame.sprite.spritecollideany(self.right_field_view, player_group, False):
-            self.player_pos = RIGHT
-            self.x_speed = self.speed
-            self.is_player_found = True
+        if not self.is_player_found:
+            if pygame.sprite.spritecollideany(self.left_field_view, self.player_group):
+                if collied := pygame.sprite.spritecollideany(self.left_field_view, self.tiles_group):
+                    if collied.rect.x < self.player_group.sprites()[0].rect.x:
+                        self.x_speed = -self.speed
+                        self.direction = LEFT
+                        self.is_player_found = True
+                else:
+                    self.x_speed = -self.speed
+                    self.direction = LEFT
+                    self.is_player_found = True
+            elif pygame.sprite.spritecollideany(self.right_field_view, self.player_group):
+                if collied := pygame.sprite.spritecollideany(self.right_field_view, self.tiles_group):
+                    if collied.rect.x > self.player_group.sprites()[0].rect.x:
+                        self.x_speed = self.speed
+                        self.direction = RIGHT
+                        self.is_player_found = True
+                else:
+                    self.x_speed = self.speed
+                    self.direction = RIGHT
+                    self.is_player_found = True
 
     def switch_direction_movement(self):
-        if self.is_player_found:
-            if self.player_pos == RIGHT and self.x_speed > 0:
-                if pygame.sprite.collide_rect(self.vertical_field_view,
-                                              player_group.sprites()[0].right_edge):
-                    self.player_pos = LEFT
-                    self.x_speed = -self.x_speed
-            if self.player_pos == LEFT and self.x_speed < 0:
-                if pygame.sprite.collide_rect(player_group.sprites()[0].left_edge,
-                                              self.vertical_field_view):
-                    self.player_pos = RIGHT
-                    self.x_speed = -self.x_speed
+        if self.direction == RIGHT:
+            if pygame.sprite.collide_rect(self.vertical_field_view,
+                                          self.player_group.sprites()[0].right_edge):
+                self.switch_direction()
+        if self.direction == LEFT:
+            if pygame.sprite.collide_rect(self.player_group.sprites()[0].left_edge,
+                                          self.vertical_field_view):
+                self.switch_direction()
+
+    def jump(self):
+        if self.collision_directions["bottom"]:
+            if self.direction == RIGHT:
+                if self.collision_directions["right"] or \
+                        not pygame.sprite.spritecollideany(self.right_search_engine_void, self.tiles_group):
+                    self.y_speed = JUMP_SPEED
+            else:
+                if self.collision_directions["left"] or \
+                        not pygame.sprite.spritecollideany(self.left_search_engine_void, self.tiles_group):
+                    self.y_speed = JUMP_SPEED
+
+    def patrolling(self):
+        if self.direction == RIGHT:
+            if self.collision_directions["right"] or \
+                    not pygame.sprite.spritecollideany(self.right_search_engine_void, self.tiles_group):
+                self.switch_direction()
+        if self.direction == LEFT:
+            if self.collision_directions["left"] or \
+                    not pygame.sprite.spritecollideany(self.left_search_engine_void, self.tiles_group):
+                self.switch_direction()
 
     def player_harassment(self):
-        pass
+        if not self.is_player_found:
+            self.player_search()
+            self.patrolling()
+        else:
+            self.switch_direction_movement()
+            self.jump()
+
+    def move_field_view(self, x, y):
+        self.vertical_field_view.rect.move_ip(x, y)
+        self.right_field_view.rect.move_ip(x, y)
+        self.left_field_view.rect.move_ip(x, y)
+
+    def move_search_engine_void(self, x, y):
+        self.right_search_engine_void.rect.move_ip(x, y)
+        self.left_search_engine_void.rect.move_ip(x, y)
+
+    def collision_with_world(self):
+        self.get_collision_directions()
+        if self.collision_directions["top"] and self.y_speed < 0:
+            self.y_speed = 0
+        if self.collision_directions["left"] and self.x_speed < 0:
+            self.rect.move_ip(-self.x_speed, 0)
+            self.move_edges(-self.x_speed, 0)
+            self.move_field_view(-self.x_speed, 0)
+            self.move_search_engine_void(-self.x_speed, 0)
+        if self.collision_directions["right"] and self.x_speed > 0:
+            self.rect.move_ip(-self.x_speed, 0)
+            self.move_edges(-self.x_speed, 0)
+            self.move_field_view(-self.x_speed, 0)
+            self.move_search_engine_void(-self.x_speed, self.y_speed)
+
+    def gravity(self, delta_t):
+        if self.collision_directions["bottom"] and self.y_speed > 0:
+            speed = -self.y_speed * delta_t
+            self.rect.move_ip(0, speed)
+            self.move_edges(0, speed)
+            self.move_field_view(0, speed)
+            self.move_search_engine_void(0, speed)
+            self.y_speed = 0
+        else:
+            if self.y_speed < MAX_GRAVITY_SPEED:
+                self.y_speed += delta_t * GRAVITY
+
+    def move(self):
+        self.rect.move_ip(self.x_speed, self.y_speed)
+
+    def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
+        super().update(delta_t)
+        self.move_field_view(self.x_speed, self.y_speed)
+        self.move_search_engine_void(self.x_speed, self.y_speed)
+        self.player_harassment()
