@@ -217,12 +217,24 @@ class Enemy(LiveObject):
             self.move_edges(-self.x_speed, 0)
             self.move_field_view(-self.x_speed, 0)
             self.move_search_engine_void(-self.x_speed, 0)
-    def collision_with_player(self):
-        if pygame.sprite.spritecollideany(self, self.player_group):
 
+    def collision_with_player(self):
+        if pygame.sprite.spritecollideany(self.right_edge, self.player_group) and self.x_speed > 0:
+            self.rect.move_ip(-self.x_speed, 0)
+            self.move_edges(-self.x_speed, 0)
+            self.move_field_view(-self.x_speed, 0)
+            self.move_search_engine_void(-self.x_speed, 0)
+        if pygame.sprite.spritecollideany(self.left_edge, self.player_group) and self.x_speed < 0:
+            self.rect.move_ip(-self.x_speed, 0)
+            self.move_edges(-self.x_speed, 0)
+            self.move_field_view(-self.x_speed, 0)
+            self.move_search_engine_void(-self.x_speed, 0)
+        if pygame.sprite.spritecollideany(self.top_edge, self.player_group) and self.y_speed < 0:
+            self.y_speed = 0
 
     def gravity(self, delta_t):
-        if self.collision_directions["bottom"] and self.y_speed > 0:
+        if (self.collision_directions["bottom"] or pygame.sprite.spritecollideany(self.bottom_edge, self.player_group)) \
+                and self.y_speed > 0:
             speed = -self.y_speed * delta_t
             self.rect.move_ip(0, speed)
             self.move_edges(0, speed)
