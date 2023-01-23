@@ -20,7 +20,7 @@ class InitialScreen:
 
     def start_screen(self):
         pygame.init()
-        pygame.mixer.music.load('data/dooms_gate.wav')
+        pygame.mixer.music.load('data/dooms_gate.ogg')
         pygame.mixer.music.play(999)
         pygame.mixer.music.set_volume(0.5)
         self.intro_text = ['Выберите уровень:']

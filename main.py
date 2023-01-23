@@ -33,9 +33,9 @@ class Game:
         start_screen = InitialScreen(screen)
         level_name = start_screen.start_screen()
         pygame.init()
-        pygame.mixer.music.load('data/fear.wav')
+        pygame.mixer.music.load('data/fear.ogg')
         pygame.mixer.music.play(999)
-        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.set_volume(0.1)
         self.player = generate_level(load_level(level_name))
         self.running = True
         font = pygame.font.Font(None, 20)
