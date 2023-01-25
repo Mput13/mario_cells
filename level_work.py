@@ -16,7 +16,7 @@ def load_level(filename):
     return level_map
 
 
-def generate_level(level):
+def generate_level(level, weapons):
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '#':
@@ -29,4 +29,5 @@ def generate_level(level):
                 Tile('hollow', x, y, hollow_group)
             elif level[y][x] == 'D':
                 Tile('door', x, y, door_group)
-    return Player(pos_player, 1, 5, tiles_group, enemy_group, player_weapons["sword"], player_weapons["bow"])
+    arsenal = [player_weapons[weapon] for weapon in weapons]
+    return Player(pos_player, 1, 5, tiles_group, enemy_group, *arsenal)

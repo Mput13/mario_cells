@@ -87,6 +87,12 @@ class Player(LiveObject):
                 self.y_speed = JUMP_SPEED
                 jump_sound.play()
 
+    # @alive_only
+    # def dash(self, event):
+    #     if not self.active_weapon:
+    #         if event.key in (pygame.K_c, pygame.K_e) and self.collision_directions["bottom"]:
+    #             self.x_speed =
+
     def move(self):
         if not self.collision_directions["bottom"]:
             self.switch_undirected("jump")

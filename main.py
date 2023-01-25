@@ -33,12 +33,13 @@ class Game:
     def start(self):
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
         start_screen = InitialScreen(screen)
-        level_name = start_screen.start_screen()
+        sc = start_screen.start_screen()
+        level_name = sc[0]
         pygame.init()
         pygame.mixer.music.load('data/fear.ogg')
         pygame.mixer.music.play(999)
         pygame.mixer.music.set_volume(0.1)
-        self.player = generate_level(load_level(level_name))
+        self.player = generate_level(load_level(level_name), sc[1])
         self.running = True
         font = pygame.font.Font(None, 20)
         text1 = font.render('Чтобы перейти к выбору уровня нажмите "Q"', 1, (255, 0, 0))
@@ -73,8 +74,7 @@ class Game:
 
     def update(self, surface, delta_t):
         if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y) \
-                or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y) \
-                or door_group.sprites()[0].rect.x < self.player.rect.x + TILE_SIZE * 2:
+                or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y):
             self.can_quit = True
         else:
             self.can_quit = False
