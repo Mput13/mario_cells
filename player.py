@@ -91,7 +91,8 @@ class Player(LiveObject):
     # def dash(self, event):
     #     if not self.active_weapon:
     #         if event.key in (pygame.K_c, pygame.K_e) and self.collision_directions["bottom"]:
-    #             self.x_speed =
+    #             self.x_speed *= 10
+    #             self.start_move(pygame.)
 
     def move(self):
         if not self.collision_directions["bottom"]:

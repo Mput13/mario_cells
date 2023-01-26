@@ -23,6 +23,8 @@ class Game:
         self.is_jump = False
         self.can_quit = False
         self.max_y = 999999
+        self.main_font = pygame.font.Font(None, 50)
+        self.alert_font = pygame.font.Font(None, 20)
 
     def setup(self):
         pass
@@ -41,8 +43,7 @@ class Game:
         pygame.mixer.music.set_volume(0.1)
         self.player = generate_level(load_level(level_name), sc[1])
         self.running = True
-        font = pygame.font.Font(None, 20)
-        text1 = font.render('Чтобы перейти к выбору уровня нажмите "Q"', 1, (255, 0, 0))
+        text1 = self.alert_font.render('Чтобы перейти к выбору уровня нажмите "Q"', 1, (0, 255, 100))
         timer = pygame.time.Clock()
         self.register_event(pygame.KEYDOWN, self.player.start_move)
         self.register_event(pygame.KEYUP, self.player.stop_move)
@@ -64,6 +65,7 @@ class Game:
             screen.blit(self.background, (0, 0))
             if self.can_quit:
                 screen.blit(text1, (10, 50))
+            self.update_text(screen)
             all_sprites.draw(screen)
             self.update(screen, delta_t)
             for sprite in all_sprites:
@@ -96,6 +98,9 @@ class Game:
         pygame.mixer.music.unload()
         self.start()
 
+    def update_text(self, screen):
+        health = self.main_font.render(str(self.player.health * 100), 1, (255, 0, 0))
+        screen.blit(health, (0, 0))
 
 game = Game()
 game.start()
