@@ -11,15 +11,14 @@ import pygame
 
 class Player(LiveObject):
 
-    def __init__(self, pos, health, speed, tiles_group, enemy_group, weapon_1, weapon_2, direction=RIGHT):
+    def __init__(self, pos, health, speed, tiles_group, opponent_group, weapon_1, weapon_2, direction=RIGHT):
         self.animations: dict[PlayerAnimations, PlayerAnimations] = {
             animation.name: animation.value for animation in PlayerAnimations
         }
-        super().__init__(pos, self.animations, PlayerAnimations.idle_right.name, health, speed, tiles_group, direction,
-                         player_group, all_sprites)
+        super().__init__(pos, self.animations, PlayerAnimations.idle_right.name, health, speed, tiles_group,
+                         opponent_group, direction, player_group, all_sprites)
         self.weapon_1 = weapon_1
         self.weapon_2 = weapon_2
-        self.enemy_group = enemy_group
         self.is_walking = False
 
     def switch_weapons(self):
@@ -99,6 +98,4 @@ class Player(LiveObject):
     def update(self, delta_t, *args: Any, **kwargs: Any) -> None:
         if self.active_weapon:
             self.switch_undirected("idle")
-            self.rect.move_ip(-self.x_speed, 0)
-            self.move_edges(-self.x_speed, 0)
         super().update(delta_t)

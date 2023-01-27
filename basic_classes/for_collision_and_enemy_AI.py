@@ -13,6 +13,7 @@ class CollisionsEdges:
         self.height = height
         self.wight = wight
         self.indent_from_sprite = 1
+        self.indent_from_sprite_bottom = 1
         self.indent_from_corner = 3
 
     def creating_top_edge(self):
@@ -33,7 +34,7 @@ class CollisionsEdges:
     def creating_bottom_edge(self):
         bottom_edge = pygame.sprite.Sprite(invisible_objects_group)
         bottom_edge.rect = pygame.Rect(self.pos[0] + self.indent_from_corner,
-                                       self.pos[1] + self.indent_from_sprite + self.height,
+                                       self.pos[1] + self.indent_from_sprite_bottom + self.height,
                                        self.wight - self.indent_from_corner * 2, 1)
         return bottom_edge
 
@@ -106,17 +107,20 @@ class SearchVoid:
                              "right": right}
         return all_search_engine
 
-#создаёт поле атаки врага передавать rect.center
-#class AttackField:
-#    def __init__(self, pos, radius):
-#        self.x = pos[0]
-#        self.y = pos[1]
-#        self.radius = radius
-#        self.height = 1
-#
-#    def creating_field_close_combat(self):
-#        attack_field = pygame.sprite.Sprite(invisible_objects_group)
-#
-#    def creating_field_ranged_combat(self):
-#        attack_field = pygame.sprite.Sprite(invisible_objects_group)
-#        attack_field.rect = pygame.Rect()
+
+# создаёт поле атаки врага передавать rect.center
+class AttackField:
+    def __init__(self, pos, radius, height):
+        self.x = pos[0]
+        self.y = pos[1]
+        self.radius = radius
+        self.height = height
+
+    def creating_field_attack(self):
+        right = pygame.sprite.Sprite(invisible_objects_group)
+        right.rect = pygame.Rect(self.x, self.y - self.height, self.radius, self.height)
+        left = pygame.sprite.Sprite(invisible_objects_group)
+        left.rect = pygame.Rect(self.x - self.radius, self.y - self.height, self.radius, self.height)
+        all_field = {"right": right,
+                     "left": left}
+        return all_field

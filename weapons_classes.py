@@ -4,7 +4,6 @@ from pygame.sprite import AbstractGroup
 from basic_classes.for_animation import ActionAnimation
 from values.constants import GRAVITY, RIGHT, LEFT
 from values.sprite_groups import all_sprites
-from values.animations import BowAnimations
 from typing import Any
 from utils import alive_only
 
@@ -173,20 +172,25 @@ class Bow(DealingDamage):
         self.flight_speed = flight_speed
         self.flight_range = flight_range
         self.arrow_fired = False
+        self.animations = {
+            "shot_right": ActionAnimation(pygame.image.load("data/animations/weapons/bow_shot.png"), 6, 4, (35, 45), 60,
+                                          RIGHT),
+            "shot_left": ActionAnimation(
+                pygame.transform.flip(pygame.image.load("data/animations/weapons/bow_shot.png"), flip_x=True,
+                                      flip_y=False), 6, 4, (35, 45), 60, LEFT)}
 
     def choosing_direction(self):
-        animations: dict[BowAnimations, BowAnimations] = {animation.name: animation.value for animation in
-                                                          BowAnimations}
         if self.direction == RIGHT:
-            self.animation: ActionAnimation = animations['shot_right']
+            self.animation: ActionAnimation = self.animations['shot_right']
         else:
-            self.animation: ActionAnimation = animations['shot_left']
+            self.animation: ActionAnimation = self.animations['shot_left']
 
     def arrow_release(self):
         if self.animation.cur_frame == 12 and not self.arrow_fired:
             pos = (self.pos[0],
                    self.pos[1] + self.rect.height // 2 - Arrow.IMAGE_RIGHT.get_height() // 2)
-            arrow = Arrow(self.damage, self.crit_multiplier, self.crit_chance, pos, self.enemy_group, self.tiles_group,
+            arrow = Arrow(self.damage, self.crit_multiplier, self.crit_chance, pos, self.enemy_group,
+                          self.tiles_group,
                           self.direction, self.flight_speed, self.flight_range)
             self.arrow_fired = True
 

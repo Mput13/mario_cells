@@ -1,9 +1,9 @@
 from tiles import Tile
 from player import Player
-from basic_classes.for_live_object_and_enemy import Enemy
+from basic_classes.for_live_object_and_enemy import Enemy, EnemyWithCloseCombat, EnemyWithRangedCombat
 from values.constants import SIZE_BLOCK
 from values.sprite_groups import tiles_group, enemy_group, door_group, player_group
-from values.weapons import player_weapons
+from values.weapons import player_weapons, enemy_weapons
 import os
 
 
@@ -26,6 +26,6 @@ def generate_level(level):
             elif level[y][x] == 'D':
                 Tile('door', x, y, door_group)
             elif level[y][x] == "!":
-                enemy = Enemy((x*SIZE_BLOCK, y*SIZE_BLOCK), 100, 4, "sword", 5, tiles_group, player_group)
+                enemy = EnemyWithRangedCombat((x*SIZE_BLOCK, y*SIZE_BLOCK), 100, 4, enemy_weapons["bow"], 5, tiles_group, player_group)
 
-    return Player(pos_player, 1, 5, tiles_group, enemy_group, player_weapons["sword"], player_weapons["bow"])
+    return Player(pos_player, 100, 5, tiles_group, enemy_group, player_weapons["sword"], player_weapons["bow"])

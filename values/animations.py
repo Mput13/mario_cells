@@ -4,13 +4,6 @@ import pygame
 from values.constants import RIGHT, LEFT
 
 
-class BowAnimations(enum.Enum):
-    shot_right = ActionAnimation(pygame.image.load("data/animations/weapons/bow_shot.png"), 6, 4, (35, 45), 60, RIGHT)
-    shot_left = ActionAnimation(
-        pygame.transform.flip(pygame.image.load("data/animations/weapons/bow_shot.png"), flip_x=True, flip_y=False),
-        6, 4, (35, 45), 60, LEFT)
-
-
 class PlayerAnimations(enum.Enum):
     walk_right = ActionAnimation(pygame.image.load("data/animations/characters/player/walk.png"),
                                  3, 1, (58, 58), 20, RIGHT)
