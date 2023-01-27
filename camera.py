@@ -5,7 +5,7 @@ class Camera:
     def __init__(self):
         self.dx = 0
         self.dy = 0
-        self.delimeter = 1
+        self.delimeter = 3
 
     def apply(self, obj):
         obj.rect.x += self.dx // self.delimeter

@@ -1,6 +1,7 @@
 import random
 import pygame
 from pygame.sprite import AbstractGroup
+from sounds import bow_sound, sword_sound
 from basic_classes.for_animation import ActionAnimation
 from values.constants import GRAVITY, RIGHT, LEFT
 from values.sprite_groups import all_sprites
@@ -91,6 +92,15 @@ class Sword(DealingDamage):
             if enemy not in self.conflict_list:
                 self.conflict_list.append(enemy)
                 enemy.health -= self.get_damage()
+
+    def attack(self, pos, direction, weapon_group: AbstractGroup):
+        sword_sound.play()
+        self.direction = direction
+        self.pos = pos
+        weapon_group.add(self)
+        all_sprites.add(self)
+        self.is_attacking = True
+
 
 
 class Arrow(DealingDamage):
@@ -208,6 +218,7 @@ class Bow(DealingDamage):
             self.stop_animation()
 
     def attack(self, pos, direction, weapon_group: AbstractGroup):
+        bow_sound.play()
         super().attack(pos, direction, weapon_group)
         self.choosing_direction()
         self.image = self.animation.image

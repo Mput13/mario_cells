@@ -4,10 +4,11 @@ import pygame
 
 from basic_classes.initial_screen import InitialScreen
 from camera import Camera
+from sounds import death_sound
 from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE
 from level_work import generate_level, load_level
 from values.sprite_groups import all_sprites, door_group, tiles_group, player_group, boxes_group, enemy_group, \
-    active_weapons_group, enemy_shells, invisible_objects_group
+    active_weapons_group, enemy_shells, invisible_objects_group, hollow_group
 from utils import load_image
 
 
@@ -21,6 +22,9 @@ class Game:
         self.player = None
         self.is_jump = False
         self.can_quit = False
+        self.max_y = 999999
+        self.main_font = pygame.font.Font(None, 50)
+        self.alert_font = pygame.font.Font(None, 20)
 
     def setup(self):
         pass
@@ -31,15 +35,15 @@ class Game:
     def start(self):
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
         start_screen = InitialScreen(screen)
-        level_name = start_screen.start_screen()
+        sc = start_screen.start_screen()
+        level_name = sc[0]
         pygame.init()
-        pygame.mixer.music.load('data/fear.wav')
+        pygame.mixer.music.load('data/fear.ogg')
         pygame.mixer.music.play(999)
-        pygame.mixer.music.set_volume(0.3)
-        self.player = generate_level(load_level(level_name))
+        pygame.mixer.music.set_volume(0.1)
+        self.player = generate_level(load_level(level_name), sc[1])
         self.running = True
-        font = pygame.font.Font(None, 20)
-        text1 = font.render('Чтобы перейти к выбору уровня нажмите "Q"', 1, (255, 0, 0))
+        text1 = self.alert_font.render('Чтобы перейти к выбору уровня нажмите "Q"', 1, (0, 255, 100))
         timer = pygame.time.Clock()
         self.register_event(pygame.KEYDOWN, self.player.start_move)
         self.register_event(pygame.KEYUP, self.player.stop_move)
@@ -61,6 +65,7 @@ class Game:
             screen.blit(self.background, (0, 0))
             if self.can_quit:
                 screen.blit(text1, (10, 50))
+            self.update_text(screen)
             all_sprites.draw(screen)
             self.update(screen, delta_t)
             for sprite in all_sprites:
@@ -71,14 +76,17 @@ class Game:
 
     def update(self, surface, delta_t):
         if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y) \
-                or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y) \
-                or door_group.sprites()[0].rect.x < self.player.rect.x + TILE_SIZE * 2:
+                or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y):
             self.can_quit = True
         else:
             self.can_quit = False
+        if pygame.sprite.spritecollideany(self.player, hollow_group):
+            death_sound.play()
+            self.restart()
         all_sprites.update(delta_t)
 
     def restart(self):
+        hollow_group.empty()
         all_sprites.empty()
         tiles_group.empty()
         player_group.empty()
@@ -90,6 +98,9 @@ class Game:
         pygame.mixer.music.unload()
         self.start()
 
+    def update_text(self, screen):
+        health = self.main_font.render(str(self.player.health * 100), 1, (255, 0, 0))
+        screen.blit(health, (0, 0))
 
 game = Game()
 game.start()
