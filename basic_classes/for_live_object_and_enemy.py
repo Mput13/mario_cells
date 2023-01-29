@@ -109,12 +109,14 @@ class LiveObject(ActionAnimatedSprite):
 
 class Enemy(LiveObject):
     def __init__(self, pos, health, speed, weapon, cooldown_attack, tiles_group, opponent_group):
-        self.animations = {
-            "idle_right": ActionAnimation(pygame.image.load("data/world/question_block.png"), 1, 1, (60, 60), 60, RIGHT)
-        }
         self.setup()
+        self.animations = {
+            "idle_right": ActionAnimation(pygame.image.load("data/animations/characters/enemies/mushroom/idle.png"), 1,
+                                          1, (60, 60), 60, RIGHT)
+        }
         super().__init__(pos, self.animations, "idle_right", health, speed, tiles_group,
                          opponent_group, RIGHT, enemy_group, all_sprites)
+
         self.weapon = weapon
         self.right_attack_field = None
         self.left_attack_field = None
@@ -320,6 +322,7 @@ class Enemy(LiveObject):
 
 
 class EnemyWithCloseCombat(Enemy):
+
     def creating_attack_field(self):
         creator = AttackField(self.rect.center, self.weapon.rect.height, self.weapon.rect.height)
         all_field = creator.creating_field_attack()
@@ -329,6 +332,7 @@ class EnemyWithCloseCombat(Enemy):
 
 
 class EnemyWithRangedCombat(Enemy):
+
     def creating_attack_field(self):
         creator = AttackField(self.rect.center, self.weapon.flight_range, 1)
         all_field = creator.creating_field_attack()
