@@ -96,7 +96,7 @@ class Sword(DealingDamage):
     def attack(self, pos, direction, weapon_group: AbstractGroup):
         sword_sound.play()
         self.direction = direction
-        self.pos = pos
+        self.pos = pos[0] - 15 * direction, pos[1]
         weapon_group.add(self)
         all_sprites.add(self)
         self.is_attacking = True

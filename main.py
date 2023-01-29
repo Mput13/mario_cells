@@ -1,7 +1,7 @@
 import collections
 
 import pygame
-
+from time import time
 from basic_classes.initial_screen import InitialScreen
 from camera import Camera
 from sounds import death_sound
@@ -23,8 +23,11 @@ class Game:
         self.is_jump = False
         self.can_quit = False
         self.max_y = 999999
+        self.last_use = time()
+        self.is_dash = False
         self.main_font = pygame.font.Font(None, 50)
         self.alert_font = pygame.font.Font(None, 20)
+        self.last_health = None
 
     def setup(self):
         pass
@@ -51,6 +54,7 @@ class Game:
         self.register_event(pygame.MOUSEBUTTONDOWN, self.player.use_weapon)
         camera = Camera()
         while self.running:
+            self.last_health = self.player.health
             delta_t = timer.tick(FPS) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -61,20 +65,22 @@ class Game:
             key = pygame.key.get_pressed()
             if key[pygame.K_q] and self.can_quit:
                 self.restart()
+            if key[pygame.K_e] and not self.is_dash and time() - self.last_use >= 0.6:
+                self.last_use = time()
+                self.is_dash = False
+            if self.is_dash and self.player.health < self.last_health:
+                self.player.health = self.last_health
             camera.update(self.player)
             screen.blit(self.background, (0, 0))
             if self.can_quit:
                 screen.blit(text1, (10, 50))
             self.update_text(screen)
             all_sprites.draw(screen)
-            self.update(screen, delta_t)
-            for sprite in all_sprites:
-                camera.apply(sprite)
-            for sprite in invisible_objects_group:
-                camera.apply(sprite)
-            pygame.display.flip()
 
     def update(self, surface, delta_t):
+        if self.player.health <= 0:
+            death_sound.play()
+            self.restart()
         if door_group.sprites()[0].rect.collidepoint(self.player.rect.x + TILE_SIZE * 2, self.player.rect.y) \
                 or door_group.sprites()[0].rect.collidepoint(self.player.rect.x - TILE_SIZE * 2, self.player.rect.y):
             self.can_quit = True
@@ -99,7 +105,7 @@ class Game:
         self.start()
 
     def update_text(self, screen):
-        health = self.main_font.render(str(self.player.health * 100), 1, (255, 0, 0))
+        health = self.main_font.render(str(self.player.health), 1, (255, 0, 0))
         screen.blit(health, (0, 0))
 
 game = Game()

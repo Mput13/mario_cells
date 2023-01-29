@@ -109,7 +109,9 @@ class LiveObject(ActionAnimatedSprite):
 
 class Enemy(LiveObject):
     def __init__(self, pos, health, speed, weapon, cooldown_attack, tiles_group, opponent_group):
-        self.animations = None
+        self.animations = {
+            "idle_right": ActionAnimation(pygame.image.load("data/world/question_block.png"), 1, 1, (60, 60), 60, RIGHT)
+        }
         self.setup()
         super().__init__(pos, self.animations, "idle_right", health, speed, tiles_group,
                          opponent_group, RIGHT, enemy_group, all_sprites)
