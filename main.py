@@ -66,7 +66,11 @@ class Game:
             if key[pygame.K_q] and self.can_quit:
                 self.restart()
             if key[pygame.K_e] and not self.is_dash and time() - self.last_use >= 0.6:
+                self.is_dash = True
+                self.player.x_speed *= 5
                 self.last_use = time()
+            if time() - self.last_use >= 0.1 and self.is_dash:
+                self.player.x_speed //= 5
                 self.is_dash = False
             if self.is_dash and self.player.health < self.last_health:
                 self.player.health = self.last_health
@@ -76,6 +80,12 @@ class Game:
                 screen.blit(text1, (10, 50))
             self.update_text(screen)
             all_sprites.draw(screen)
+            self.update(screen, delta_t)
+            for sprite in all_sprites:
+                camera.apply(sprite)
+            for sprite in invisible_objects_group:
+                camera.apply(sprite)
+            pygame.display.flip()
 
     def update(self, surface, delta_t):
         if self.player.health <= 0:
