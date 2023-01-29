@@ -228,7 +228,7 @@ class Bow(DealingDamage):
         self.pos = (self.rect.x, self.rect.y)
         self.animation.set_play_single()
 
-
+#в разработкев
 class Shield(pygame.sprite.Sprite):
     IMAGE_RIGHT = pygame.image.load("data/weapons/shield_right.png")
     IMAGE_LEFT = pygame.image.load("data/weapons/shield_left.png")

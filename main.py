@@ -5,7 +5,7 @@ from time import time
 from basic_classes.initial_screen import InitialScreen
 from camera import Camera
 from sounds import death_sound
-from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE
+from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE, RIGHT, LEFT
 from level_work import generate_level, load_level
 from values.sprite_groups import all_sprites, door_group, tiles_group, player_group, boxes_group, enemy_group, \
     active_weapons_group, enemy_shells, invisible_objects_group, hollow_group
@@ -65,7 +65,7 @@ class Game:
             key = pygame.key.get_pressed()
             if key[pygame.K_q] and self.can_quit:
                 self.restart()
-            if key[pygame.K_e] and not self.is_dash and time() - self.last_use >= 0.9:
+            if key[pygame.K_LSHIFT] and not self.is_dash and time() - self.last_use >= 0.9:
                 self.is_dash = True
                 self.player.x_speed *= 5
                 self.last_use = time()
