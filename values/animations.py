@@ -21,7 +21,7 @@ class PlayerAnimations(enum.Enum):
         pygame.transform.flip(pygame.image.load("data/animations/characters/player/idle.png"), flip_x=True,
                               flip_y=False), 1, 1, (58, 58), 60, LEFT)
     jump_right = ActionAnimation(pygame.image.load("data/animations/characters/player/jump.png"),
-                                 1, 1, (60, 60), 60, RIGHT)
+                                 1, 1, (58, 58), 60, RIGHT)
     jump_left = ActionAnimation(
         pygame.transform.flip(pygame.image.load("data/animations/characters/player/jump.png"), flip_x=True,
                               flip_y=False), 1, 1, (58, 58), 60, LEFT)

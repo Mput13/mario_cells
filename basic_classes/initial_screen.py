@@ -36,7 +36,7 @@ class InitialScreen:
                         if len(self.chosen_weapon) == 2:
                             pygame.mixer.music.unload()
                             return self.get_chosen_level(pygame.mouse.get_pos()), self.chosen_weapon
-                    elif chosen in ('bow', 'shield_right_click', 'sword', 'shield_left_click'):
+                    elif chosen in ('bow', 'sword', 'shield'):
                         if chosen in self.chosen_weapon:
                             self.chosen_weapon.remove(chosen)
                             self.add_text()
@@ -53,8 +53,7 @@ class InitialScreen:
         self.intro_text.append('Выберите 2 орудия:')
         self.intro_text.append('bow')
         self.intro_text.append('sword')
-        self.intro_text.append('shield_right_click')
-        self.intro_text.append('shield_left_click')
+        self.intro_text.append('shield')
         fon = pygame.transform.scale(load_image('data/initial_screen.jpg'), (WIDTH, HEIGHT))
         self.screen.blit(fon, (0, 0))
         font = pygame.font.Font(None, 70)

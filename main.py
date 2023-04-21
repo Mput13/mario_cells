@@ -52,6 +52,7 @@ class Game:
         self.register_event(pygame.KEYUP, self.player.stop_move)
         self.register_event(pygame.KEYDOWN, self.player.jump)
         self.register_event(pygame.MOUSEBUTTONDOWN, self.player.use_weapon)
+        self.register_event(pygame.MOUSEBUTTONUP, self.player.stop_shield_block)
         camera = Camera()
         while self.running:
             self.last_health = self.player.health
@@ -79,8 +80,8 @@ class Game:
             if self.can_quit:
                 screen.blit(text1, (10, 50))
             self.update_text(screen)
-            all_sprites.draw(screen)
             self.update(screen, delta_t)
+            all_sprites.draw(screen)
             for sprite in all_sprites:
                 camera.apply(sprite)
             for sprite in invisible_objects_group:
@@ -117,6 +118,7 @@ class Game:
     def update_text(self, screen):
         health = self.main_font.render(str(self.player.health), 1, (255, 0, 0))
         screen.blit(health, (0, 0))
+
 
 game = Game()
 game.start()
