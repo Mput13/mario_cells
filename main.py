@@ -5,7 +5,7 @@ from time import time
 from basic_classes.initial_screen import InitialScreen
 from camera import Camera
 from sounds import death_sound
-from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE
+from values.constants import WIDTH, HEIGHT, FPS, TILE_SIZE, RIGHT, LEFT
 from level_work import generate_level, load_level
 from values.sprite_groups import all_sprites, door_group, tiles_group, player_group, boxes_group, enemy_group, \
     active_weapons_group, enemy_shells, invisible_objects_group, hollow_group
@@ -52,6 +52,7 @@ class Game:
         self.register_event(pygame.KEYUP, self.player.stop_move)
         self.register_event(pygame.KEYDOWN, self.player.jump)
         self.register_event(pygame.MOUSEBUTTONDOWN, self.player.use_weapon)
+        self.register_event(pygame.MOUSEBUTTONUP, self.player.stop_shield_block)
         camera = Camera()
         while self.running:
             self.last_health = self.player.health
@@ -79,8 +80,8 @@ class Game:
             if self.can_quit:
                 screen.blit(text1, (10, 50))
             self.update_text(screen)
-            all_sprites.draw(screen)
             self.update(screen, delta_t)
+            all_sprites.draw(screen)
             for sprite in all_sprites:
                 camera.apply(sprite)
             for sprite in invisible_objects_group:
@@ -117,6 +118,7 @@ class Game:
     def update_text(self, screen):
         health = self.main_font.render(str(self.player.health), 1, (255, 0, 0))
         screen.blit(health, (0, 0))
+
 
 game = Game()
 game.start()

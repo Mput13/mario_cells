@@ -3,7 +3,7 @@ from values.constants import RIGHT, LEFT
 from basic_classes.for_live_object_and_enemy import EnemyWithCloseCombat, EnemyWithRangedCombat
 from basic_classes.for_animation import ActionAnimation
 
-
+#в разработке
 class MushroomCloseCombat(EnemyWithCloseCombat):
     def setup(self):
         self.animations = {

@@ -102,7 +102,6 @@ class Sword(DealingDamage):
         self.is_attacking = True
 
 
-
 class Arrow(DealingDamage):
     IMAGE_RIGHT = pygame.image.load("data/weapons/arrow_right.png")
     IMAGE_LEFT = pygame.image.load("data/weapons/arrow_left.png")
@@ -229,17 +228,19 @@ class Bow(DealingDamage):
         self.animation.set_play_single()
 
 
+# в разработкев
 class Shield(pygame.sprite.Sprite):
     IMAGE_RIGHT = pygame.image.load("data/weapons/shield_right.png")
     IMAGE_LEFT = pygame.image.load("data/weapons/shield_left.png")
 
     def __init__(self,
-                 button,
+                 max_block_timer: float,
                  *group):
         super().__init__(*group)
         self.direction = None
-        self.button = button
         self.is_attacking = False
+        self.max_time_block = max_block_timer
+        self.block_timer = 0
 
     def selection_image(self):
         if self.direction == RIGHT:
@@ -257,13 +258,11 @@ class Shield(pygame.sprite.Sprite):
     def blocking(self):
         pass
 
-    def update(self, delt_t, event, *args: Any, **kwargs: Any) -> None:
+    # переработать
+    def update(self, delt_t, *args: Any, **kwargs: Any) -> None:
         if self.is_attacking:
             self.blocking()
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == self.button:
-                    self.kill()
-                    self.is_attacking = False
+            self.automatic_block_stop(delt_t)
 
     def attack(self, pos, direction, weapon_group: AbstractGroup):
         self.selection_image()
@@ -274,3 +273,14 @@ class Shield(pygame.sprite.Sprite):
         weapon_group.add(self)
         all_sprites.add(self)
         self.is_attacking = True
+
+    def stop_animation(self):
+        self.kill()
+        self.block_timer = 0
+
+    def automatic_block_stop(self, delta_t):
+        if self.block_timer < self.max_time_block:
+            self.block_timer += delta_t
+        else:
+            self.stop_animation()
+

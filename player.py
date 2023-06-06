@@ -20,6 +20,8 @@ class Player(LiveObject):
         self.weapon_1 = weapon_1
         self.weapon_2 = weapon_2
         self.is_walking = False
+        self.is_active_shield = False
+        self.shield_button = None
 
     def switch_weapons(self):
         self.weapon_1, self.weapon_2 = self.weapon_2, self.weapon_1
@@ -63,9 +65,20 @@ class Player(LiveObject):
                     self.switch_undirected("idle")
 
     @alive_only
+    def stop_shield_block(self, event):
+        if self.is_active_shield:
+            button = event.button
+            if button in (pygame.BUTTON_RIGHT, pygame.BUTTON_LEFT):
+                if button == pygame.BUTTON_LEFT:
+                    self.weapon_1.stop_animation()
+                elif button == pygame.BUTTON_RIGHT:
+                    self.weapon_2.stop_animation()
+                self.is_active_shield = False
+
+    @alive_only
     def use_weapon(self, event):
         if self.collision_directions["bottom"]:
-            if not self.active_weapon:
+            if not self.active_weapon and not self.is_active_shield:
                 button = event.button
                 if button in (pygame.BUTTON_RIGHT, pygame.BUTTON_LEFT):
                     if self.direction == RIGHT:
@@ -74,9 +87,16 @@ class Player(LiveObject):
                         coefficient = 0
                     pos = (self.rect.x + coefficient, self.rect.y + self.rect.height // 2)
                     if button == pygame.BUTTON_LEFT:
+                        if isinstance(self.weapon_1, Shield):
+                            self.is_active_shield = True
+                            self.shield_button = button
                         self.weapon_1.attack(pos, self.direction, self.active_weapon)
                     elif button == pygame.BUTTON_RIGHT:
+                        if isinstance(self.weapon_2, Shield):
+                            self.is_active_shield = True
+                            self.shield_button = button
                         self.weapon_2.attack(pos, self.direction, self.active_weapon)
+                    print(button, self.shield_button)
 
     @alive_only
     def jump(self, event):
