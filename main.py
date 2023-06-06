@@ -65,7 +65,7 @@ class Game:
             key = pygame.key.get_pressed()
             if key[pygame.K_q] and self.can_quit:
                 self.restart()
-            if key[pygame.K_e] and not self.is_dash and time() - self.last_use >= 0.9:
+            if key[pygame.K_LSHIFT] and not self.is_dash and time() - self.last_use >= 0.9:
                 self.is_dash = True
                 self.player.x_speed *= 5
                 self.last_use = time()
