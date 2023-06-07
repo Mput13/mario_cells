@@ -39,10 +39,10 @@ class InitialScreen:
                             pygame.mixer.music.unload()
                             return f'{self.get_chosen_level(pygame.mouse.get_pos())}.txt', self.chosen_weapon
                     elif chosen in ('Лук', 'Щит', 'Меч'):
-                        if chosen in self.chosen_weapon:
+                        if names.get(chosen) in self.chosen_weapon:
                             self.chosen_weapon.remove(names[chosen])
                             self.add_text()
-                        elif len(self.chosen_weapon) <= 1 and chosen not in self.chosen_weapon:
+                        elif len(self.chosen_weapon) <= 1 and names[chosen] not in self.chosen_weapon:
                             self.chosen_weapon.append(names[chosen])
                             self.add_text()
             pygame.display.flip()
