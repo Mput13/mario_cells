@@ -27,6 +27,7 @@ class LiveObject(ActionAnimatedSprite):
         self.collision_directions = None
         self.opponent_group = opponent_group
         self.active_weapon = pygame.sprite.Group()
+        self.is_invulnerable = False
 
     def creating_edges(self):
         creator_edges = CollisionsEdges((self.rect.x, self.rect.y), self.rect.height, self.rect.width)

@@ -91,7 +91,8 @@ class Sword(DealingDamage):
         for enemy in collide:
             if enemy not in self.conflict_list:
                 self.conflict_list.append(enemy)
-                enemy.health -= self.get_damage()
+                if not enemy.is_invulnerable:
+                    enemy.health -= self.get_damage()
 
     def attack(self, pos, direction, weapon_group: AbstractGroup):
         sword_sound.play()
@@ -140,7 +141,8 @@ class Arrow(DealingDamage):
     def dealing_damage(self):
         collide = pygame.sprite.spritecollideany(self, self.enemy_group)
         if collide is not None:
-            collide.health -= self.get_damage()
+            if not collide.is_invulnerable:
+                collide.health -= self.get_damage()
             self.kill()
             self.is_dead = True
 
@@ -268,7 +270,7 @@ class Shield(pygame.sprite.Sprite):
         self.selection_image()
         self.direction = direction
         self.rect = self.image.get_rect()
-        self.rect.x = pos[0] + self.rect.width * self.direction
+        self.rect.x = pos[0] - self.rect.width + 13
         self.rect.y = pos[1] - self.rect.height // 2
         weapon_group.add(self)
         all_sprites.add(self)

@@ -70,11 +70,11 @@ class Game:
                 self.is_dash = True
                 self.player.x_speed *= 5
                 self.last_use = time()
+                self.player.is_invulnerable = True
             if time() - self.last_use >= 0.1 and self.is_dash:
                 self.player.x_speed //= 5
                 self.is_dash = False
-            if self.is_dash and self.player.health < self.last_health:
-                self.player.health = self.last_health
+                self.player.is_invulnerable = False
             camera.update(self.player)
             screen.blit(self.background, (0, 0))
             if self.can_quit:
@@ -103,6 +103,7 @@ class Game:
         all_sprites.update(delta_t)
 
     def restart(self):
+        self.player.is_dead = True
         hollow_group.empty()
         all_sprites.empty()
         tiles_group.empty()
