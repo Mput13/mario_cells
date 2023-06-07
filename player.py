@@ -23,6 +23,7 @@ class Player(LiveObject):
         self.is_active_shield = False
         self.shield_button = None
 
+
     def switch_weapons(self):
         self.weapon_1, self.weapon_2 = self.weapon_2, self.weapon_1
 
@@ -73,6 +74,7 @@ class Player(LiveObject):
                     self.weapon_1.stop_animation()
                 elif button == pygame.BUTTON_RIGHT:
                     self.weapon_2.stop_animation()
+                self.is_invulnerable = False
                 self.is_active_shield = False
 
     @alive_only
@@ -89,14 +91,15 @@ class Player(LiveObject):
                     if button == pygame.BUTTON_LEFT:
                         if isinstance(self.weapon_1, Shield):
                             self.is_active_shield = True
+                            self.is_invulnerable = True
                             self.shield_button = button
                         self.weapon_1.attack(pos, self.direction, self.active_weapon)
                     elif button == pygame.BUTTON_RIGHT:
                         if isinstance(self.weapon_2, Shield):
                             self.is_active_shield = True
+                            self.is_invulnerable = True
                             self.shield_button = button
                         self.weapon_2.attack(pos, self.direction, self.active_weapon)
-                    print(button, self.shield_button)
 
     @alive_only
     def jump(self, event):
